@@ -11,22 +11,22 @@ export default class App extends Component {
     super(props);
     this.state = {
       data: [
-        { id: 1, key: "A", count: 0 },
-        { id: 2, key: "B", count: 0 },
-        { id: 3, key: "C", count: 0 },
-        { id: 4, key: "D", count: 0 },
-        { id: 5, key: "E", count: 0 },
-        { id: 6, key: "F", count: 0 },
-        { id: 7, key: "G", count: 0 },
-        { id: 8, key: "H", count: 0 },
-        { id: 9, key: "I", count: 0 },
-        { id: 10, key: "J", count: 0 },
-        { id: 11, key: "K", count: 0 },
-        { id: 12, key: "L", count: 0 },
-        { id: 13, key: "M", count: 0 },
-        { id: 14, key: "N", count: 0 },
-        { id: 15, key: "O", count: 0 },
-        { id: 16, key: "P", count: 0 }
+        { id: 1, key: "A", amount: 0 },
+        { id: 2, key: "B", amount: 0 },
+        { id: 3, key: "C", amount: 0 },
+        { id: 4, key: "D", amount: 0 },
+        { id: 5, key: "E", amount: 0 },
+        { id: 6, key: "F", amount: 0 },
+        { id: 7, key: "G", amount: 0 },
+        { id: 8, key: "H", amount: 0 },
+        { id: 9, key: "I", amount: 0 },
+        { id: 10, key: "J", amount: 0 },
+        { id: 11, key: "K", amount: 0 },
+        { id: 12, key: "L", amount: 0 },
+        { id: 13, key: "M", amount: 0 },
+        { id: 14, key: "N", amount: 0 },
+        { id: 15, key: "O", amount: 0 },
+        { id: 16, key: "P", amount: 0 }
       ],
       numCols: 4
     };
@@ -35,7 +35,7 @@ export default class App extends Component {
 
   // handler for adding an item
   _itemPlusHandler = id => {
-    this.state.data.find(d => d.id === id).count++;
+    this.state.data.find(d => d.id === id).amount++;
     this.setState({ data: this.state.data });
     // increment recursively when holding button
     this.timer = setTimeout(this._itemPlusHandler.bind(this, id), 80);
@@ -44,8 +44,8 @@ export default class App extends Component {
   // handler for removing an item
   _itemMinusHandler = id => {
     const data = this.state.data.find(d => d.id === id);
-    if (data.count > 0) {
-      data.count--;
+    if (data.amount > 0) {
+      data.amount--;
     }
     this.setState({ data: this.state.data });
     // increment recursively when holding button
@@ -76,7 +76,7 @@ export default class App extends Component {
             onPressOut={this._stopTimer}
           />
           <View style={Styles.itemNumber}>
-            <Text> {item.count} </Text>
+            <Text> {item.amount} </Text>
           </View>
           <Button
             title="+"
