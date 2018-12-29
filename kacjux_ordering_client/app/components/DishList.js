@@ -9,6 +9,7 @@ export default props => {
       style={Styles.itemContainer}
       renderItem={props.renderItem}
       numColumns={props.numColumns}
+      extraData={props.extraData}
     />
   );
 };

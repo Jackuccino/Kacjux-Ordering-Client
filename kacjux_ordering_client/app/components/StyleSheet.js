@@ -34,13 +34,38 @@ export default StyleSheet.create({
   },
   itemGrid: {
     flex: 1,
-    backgroundColor: "lightblue",
-    justifyContent: "center",
-    height: 150,
     margin: 15
+  },
+  itemImage: {
+    margin: 10,
+    height: 150,
+    justifyContent: "center",
+    backgroundColor: "lightblue"
   },
   itemText: {
     textAlign: "center",
     fontSize: 25
+  },
+  itemTitleContainer: {
+    justifyContent: "center",
+    flexDirection: "row"
+  },
+  itemTitle: {
+    textAlign: "center",
+    fontSize: 20
+  },
+  itemNumber: {
+    justifyContent: "center",
+    alignItems: "center",
+    borderColor: "black",
+    borderWidth: 1,
+    height: 40,
+    width: 50
+  },
+  itemButton: {
+    width: "auto",
+    borderRadius: 30,
+    width: 40,
+    height: 40
   }
 });
