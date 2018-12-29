@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "react-native-elements";
-import Styles from "./StyleSheet";
+import Styles from "../styles/StyleSheet";
 
 export default props => {
   return (

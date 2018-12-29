@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import { Alert, Text, View, TextInput } from "react-native";
+import { Alert, Text, View } from "react-native";
 
 import SubmitOrders from "./app/components/SubmitOrders";
 import DishList from "./app/components/DishList";
-import Styles from "./app/components/StyleSheet";
+import Styles from "./app/styles/StyleSheet";
 import { Button } from "react-native-elements";
 
 export default class App extends Component {
@@ -11,22 +11,22 @@ export default class App extends Component {
     super(props);
     this.state = {
       data: [
-        { id: 1, key: "A", amount: 0 },
-        { id: 2, key: "B", amount: 0 },
-        { id: 3, key: "C", amount: 0 },
-        { id: 4, key: "D", amount: 0 },
-        { id: 5, key: "E", amount: 0 },
-        { id: 6, key: "F", amount: 0 },
-        { id: 7, key: "G", amount: 0 },
-        { id: 8, key: "H", amount: 0 },
-        { id: 9, key: "I", amount: 0 },
-        { id: 10, key: "J", amount: 0 },
-        { id: 11, key: "K", amount: 0 },
-        { id: 12, key: "L", amount: 0 },
-        { id: 13, key: "M", amount: 0 },
-        { id: 14, key: "N", amount: 0 },
-        { id: 15, key: "O", amount: 0 },
-        { id: 16, key: "P", amount: 0 }
+        { id: 1, key: "A", price: 10.0, amount: 0 },
+        { id: 2, key: "B", price: 11.0, amount: 0 },
+        { id: 3, key: "C", price: 12.0, amount: 0 },
+        { id: 4, key: "D", price: 13.0, amount: 0 },
+        { id: 5, key: "E", price: 14.0, amount: 0 },
+        { id: 6, key: "F", price: 15.0, amount: 0 },
+        { id: 7, key: "G", price: 16.0, amount: 0 },
+        { id: 8, key: "H", price: 17.0, amount: 0 },
+        { id: 9, key: "I", price: 18.0, amount: 0 },
+        { id: 10, key: "J", price: 19.0, amount: 0 },
+        { id: 11, key: "K", price: 20.0, amount: 0 },
+        { id: 12, key: "L", price: 21.0, amount: 0 },
+        { id: 13, key: "M", price: 22.0, amount: 0 },
+        { id: 14, key: "N", price: 23.0, amount: 0 },
+        { id: 15, key: "O", price: 24.0, amount: 0 },
+        { id: 16, key: "P", price: 25.0, amount: 0 }
       ],
       numCols: 4
     };
@@ -92,6 +92,15 @@ export default class App extends Component {
   // fetch data to database
   _submitOrdersHandler = () => {
     // Send request
+    const orderItems = this.state.data.filter(d => d.amount != 0);
+
+    // Debug message
+    Alert.alert(
+      "Alert Title",
+      orderItems.length.toString(),
+      [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+      { cancelable: false }
+    );
   };
 
   render() {
