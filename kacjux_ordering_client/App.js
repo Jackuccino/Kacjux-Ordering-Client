@@ -5,6 +5,7 @@ import SubmitOrders from "./app/components/SubmitOrders";
 import DishList from "./app/components/DishList";
 import Styles from "./app/styles/StyleSheet";
 import { Button } from "react-native-elements";
+import Icon from "react-native-vector-icons/Entypo";
 import IconBadge from "react-native-icon-badge";
 
 import { postNewOrder } from "./app/services/Server";
@@ -127,7 +128,8 @@ export default class App extends Component {
           amount: 0
         }
       ],
-      numCols: 2
+      numCols: 2,
+      totalPrice: 0
     };
     this.timer = null;
   }
@@ -136,8 +138,9 @@ export default class App extends Component {
   _itemPlusHandler = id => {
     this.state.data.find(d => d.id === id).amount++;
     this.setState({ data: this.state.data });
+    this._getTotalPrice();
     // increment recursively when holding button
-    this.timer = setTimeout(this._itemPlusHandler.bind(this, id), 80);
+    this.timer = setTimeout(this._itemPlusHandler.bind(this, id), 85);
   };
 
   // handler for removing an item
@@ -147,8 +150,9 @@ export default class App extends Component {
       data.amount--;
     }
     this.setState({ data: this.state.data });
+    this._getTotalPrice();
     // increment recursively when holding button
-    this.timer = setTimeout(this._itemMinusHandler.bind(this, id), 80);
+    this.timer = setTimeout(this._itemMinusHandler.bind(this, id), 85);
   };
 
   // increment recursively when holding button
@@ -228,6 +232,15 @@ export default class App extends Component {
     });
   };
 
+  _getTotalPrice = () => {
+    var totalPrice = 0;
+    const items = this.state.data.filter(data => data.amount != 0);
+    items.forEach(item => {
+      totalPrice += item.amount * item.price;
+    });
+    this.setState({ totalPrice: totalPrice });
+  };
+
   render() {
     return (
       <View style={Styles.container}>
@@ -244,10 +257,9 @@ export default class App extends Component {
         />
         {/* submit button */}
         <View style={Styles.bottom}>
-          {/*  */}
           <IconBadge
             MainElement={
-              <SubmitOrders onSubmitOrders={this._submitOrdersHandler} />
+              <Icon name="shopping-cart" size={40} style={Styles.cartIcon} />
             }
             BadgeElement={
               <Text style={Styles.iconBadgeText}>
@@ -259,6 +271,10 @@ export default class App extends Component {
               this.state.data.filter(data => data.amount != 0).length === 0
             }
           />
+          <Text style={Styles.totalPrice}>
+            ${this.state.totalPrice.toFixed(2)}
+          </Text>
+          <SubmitOrders onSubmitOrders={this._submitOrdersHandler} />
         </View>
       </View>
     );

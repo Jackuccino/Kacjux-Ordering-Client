@@ -10,12 +10,13 @@ export default StyleSheet.create({
     fontSize: 50,
     textAlign: "center"
   },
+  submitContainerView: {
+    marginLeft: 0,
+    marginRight: 0
+  },
   submitButton: {
     backgroundColor: "green",
-    width: 170,
-    height: 70,
-    marginTop: 15,
-    alignSelf: "flex-end"
+    width: 160
   },
   submitText: {
     fontSize: 30
@@ -24,10 +25,18 @@ export default StyleSheet.create({
     height: "10%"
   },
   middle: {
-    height: "75%"
+    height: "90%"
   },
   bottom: {
-    height: "15%"
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "lightgrey",
+    width: "45%",
+    position: "absolute",
+    bottom: 0,
+    right: 0
   },
   itemContainer: {
     width: "100%"
@@ -81,8 +90,16 @@ export default StyleSheet.create({
     color: "white"
   },
   iconBadge: {
-    width: 30,
-    height: 30,
+    width: 20,
+    height: 20,
     backgroundColor: "red"
+  },
+  cartIcon: {
+    marginLeft: 50,
+    marginRight: 15
+  },
+  totalPrice: {
+    fontSize: 25,
+    textAlign: "left"
   }
 });

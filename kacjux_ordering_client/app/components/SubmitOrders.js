@@ -5,10 +5,10 @@ import Styles from "../styles/StyleSheet";
 export default props => {
   return (
     <Button
-      rounded
       title="Submit"
       buttonStyle={Styles.submitButton}
       textStyle={Styles.submitText}
+      containerViewStyle={Styles.submitContainerView}
       onPress={props.onSubmitOrders}
     />
   );
