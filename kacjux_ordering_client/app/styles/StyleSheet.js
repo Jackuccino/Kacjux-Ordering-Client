@@ -34,25 +34,34 @@ export default StyleSheet.create({
   },
   itemGrid: {
     flex: 1,
-    margin: 15
+    alignItems: "center",
+    margin: 5,
+    backgroundColor: "#F1F5FC"
+  },
+  itemTitlePrice: {
+    margin: 5,
+    flex: 1,
+    flexDirection: "row",
+    alignSelf: "flex-start"
   },
   itemImage: {
-    margin: 10,
-    height: 150,
-    justifyContent: "center",
-    backgroundColor: "lightblue"
-  },
-  itemText: {
-    textAlign: "center",
-    fontSize: 25
-  },
-  itemTitleContainer: {
-    justifyContent: "center",
-    flexDirection: "row"
+    height: 300,
+    width: "100%"
   },
   itemTitle: {
-    textAlign: "center",
+    flex: 1,
     fontSize: 20
+  },
+  itemPrice: {
+    flex: 1,
+    textAlign: "right",
+    fontSize: 20
+  },
+  itemCounterContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignSelf: "flex-end",
+    margin: 5
   },
   itemNumber: {
     justifyContent: "center",
@@ -60,12 +69,20 @@ export default StyleSheet.create({
     borderColor: "black",
     borderWidth: 1,
     height: 40,
-    width: 50
+    width: 60
   },
   itemButton: {
     width: "auto",
     borderRadius: 30,
     width: 40,
     height: 40
+  },
+  iconBadgeText: {
+    color: "white"
+  },
+  iconBadge: {
+    width: 30,
+    height: 30,
+    backgroundColor: "red"
   }
 });
