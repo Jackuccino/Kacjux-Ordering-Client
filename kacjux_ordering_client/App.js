@@ -19,112 +19,35 @@ export default class App extends Component {
           id: 1,
           key: "Mar Far Chichen",
           image: require("./app/assets/images/mfch.png"),
-          price: 9,
+          price: 10.25,
           amount: 0
         },
         {
           id: 2,
           key: "Lemon Chichen",
           image: require("./app/assets/images/lemonch.jpg"),
-          price: 10,
+          price: 11.75,
           amount: 0
         },
         {
           id: 3,
           key: "Sesame Chichen",
           image: require("./app/assets/images/sesamech.jpg"),
-          price: 11,
+          price: 11.5,
           amount: 0
         },
         {
           id: 4,
-          key: "Title D",
-          image: require("./app/assets/images/mfch.png"),
-          price: 13,
+          key: "Barbeque Pork",
+          image: require("./app/assets/images/bbqpork.jpg"),
+          price: 8.5,
           amount: 0
         },
         {
           id: 5,
-          key: "Title E",
-          image: require("./app/assets/images/mfch.png"),
-          price: 14.0,
-          amount: 0
-        },
-        {
-          id: 6,
-          key: "Title F",
-          image: require("./app/assets/images/mfch.png"),
-          price: 15.0,
-          amount: 0
-        },
-        {
-          id: 7,
-          key: "Title G",
-          image: require("./app/assets/images/mfch.png"),
-          price: 16.0,
-          amount: 0
-        },
-        {
-          id: 8,
-          key: "Title H",
-          image: require("./app/assets/images/mfch.png"),
-          price: 17.0,
-          amount: 0
-        },
-        {
-          id: 9,
-          key: "Title I",
-          image: require("./app/assets/images/mfch.png"),
-          price: 18.0,
-          amount: 0
-        },
-        {
-          id: 10,
-          key: "Title J",
-          image: require("./app/assets/images/mfch.png"),
-          price: 19.0,
-          amount: 0
-        },
-        {
-          id: 11,
-          key: "Title K",
-          image: require("./app/assets/images/mfch.png"),
-          price: 20.0,
-          amount: 0
-        },
-        {
-          id: 12,
-          key: "Title L",
-          image: require("./app/assets/images/mfch.png"),
-          price: 21.0,
-          amount: 0
-        },
-        {
-          id: 13,
-          key: "Title M",
-          image: require("./app/assets/images/mfch.png"),
-          price: 22.0,
-          amount: 0
-        },
-        {
-          id: 14,
-          key: "Title N",
-          image: require("./app/assets/images/mfch.png"),
-          price: 23.0,
-          amount: 0
-        },
-        {
-          id: 15,
-          key: "Title O",
-          image: require("./app/assets/images/mfch.png"),
-          price: 24.0,
-          amount: 0
-        },
-        {
-          id: 16,
-          key: "Title P",
-          image: require("./app/assets/images/mfch.png"),
-          price: 25.0,
+          key: "Pot Stickers",
+          image: require("./app/assets/images/potsticker.jpg"),
+          price: 9.75,
           amount: 0
         }
       ],
@@ -136,9 +59,10 @@ export default class App extends Component {
 
   // handler for adding an item
   _itemPlusHandler = id => {
-    this.state.data.find(d => d.id === id).amount++;
+    const data = this.state.data.find(d => d.id === id);
+    data.amount++;
+    this._addTotalPrice(data.price);
     this.setState({ data: this.state.data });
-    this._getTotalPrice();
     // increment recursively when holding button
     this.timer = setTimeout(this._itemPlusHandler.bind(this, id), 85);
   };
@@ -148,11 +72,19 @@ export default class App extends Component {
     const data = this.state.data.find(d => d.id === id);
     if (data.amount > 0) {
       data.amount--;
+      this._minusTotalPrice(data.price);
     }
     this.setState({ data: this.state.data });
-    this._getTotalPrice();
     // increment recursively when holding button
     this.timer = setTimeout(this._itemMinusHandler.bind(this, id), 85);
+  };
+
+  _addTotalPrice = price => {
+    this.setState({ totalPrice: this.state.totalPrice + price });
+  };
+
+  _minusTotalPrice = price => {
+    this.setState({ totalPrice: this.state.totalPrice - price });
   };
 
   // increment recursively when holding button
@@ -230,15 +162,6 @@ export default class App extends Component {
           // post failed
         });
     });
-  };
-
-  _getTotalPrice = () => {
-    var totalPrice = 0;
-    const items = this.state.data.filter(data => data.amount != 0);
-    items.forEach(item => {
-      totalPrice += item.amount * item.price;
-    });
-    this.setState({ totalPrice: totalPrice });
   };
 
   render() {
