@@ -52,7 +52,8 @@ export default class App extends Component {
         }
       ],
       numCols: 2,
-      totalPrice: 0
+      totalPrice: 0,
+      totalItem: 0
     };
     this.timer = null;
   }
@@ -61,6 +62,7 @@ export default class App extends Component {
   _itemPlusHandler = id => {
     const data = this.state.data.find(d => d.id === id);
     data.amount++;
+    this._addTotalItem();
     this._addTotalPrice(data.price);
     this.setState({ data: this.state.data });
     // increment recursively when holding button
@@ -72,11 +74,17 @@ export default class App extends Component {
     const data = this.state.data.find(d => d.id === id);
     if (data.amount > 0) {
       data.amount--;
+      this._minusTotalItem();
       this._minusTotalPrice(data.price);
     }
     this.setState({ data: this.state.data });
     // increment recursively when holding button
     this.timer = setTimeout(this._itemMinusHandler.bind(this, id), 85);
+  };
+
+  // increment recursively when holding button
+  _stopTimer = () => {
+    clearTimeout(this.timer);
   };
 
   _addTotalPrice = price => {
@@ -87,9 +95,12 @@ export default class App extends Component {
     this.setState({ totalPrice: this.state.totalPrice - price });
   };
 
-  // increment recursively when holding button
-  _stopTimer = () => {
-    clearTimeout(this.timer);
+  _addTotalItem = () => {
+    this.setState({ totalItem: this.state.totalItem + 1 });
+  };
+
+  _minusTotalItem = () => {
+    this.setState({ totalItem: this.state.totalItem - 1 });
   };
 
   // rendering data for item list
@@ -185,14 +196,11 @@ export default class App extends Component {
               <Icon name="shopping-cart" size={40} style={Styles.cartIcon} />
             }
             BadgeElement={
-              <Text style={Styles.iconBadgeText}>
-                {this.state.data.filter(data => data.amount != 0).length}
-              </Text>
+              <Text style={Styles.iconBadgeText}>{this.state.totalItem}</Text>
             }
             IconBadgeStyle={Styles.iconBadge}
-            Hidden={
-              this.state.data.filter(data => data.amount != 0).length === 0
-            }
+            Hidden={this.state.totalItem === 0}
+            extraData={this.state}
           />
           <Text style={Styles.totalPrice}>
             ${this.state.totalPrice.toFixed(2)}
