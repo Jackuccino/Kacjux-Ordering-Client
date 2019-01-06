@@ -169,8 +169,8 @@ export default class App extends Component {
             // failure
           }
         })
-        .catch(error => {
-          // post failed
+        .catch(err => {
+          console.log(err);
         });
     });
   };
@@ -183,12 +183,14 @@ export default class App extends Component {
           <Text style={Styles.title}>Prototype: Submit an Order</Text>
         </View>
         {/* item list */}
-        <DishList
-          data={this.state.data}
-          renderItem={this._renderItem}
-          numColumns={this.state.numCols}
-          extraData={this.state}
-        />
+        <View style={Styles.middle}>
+          <DishList
+            data={this.state.data}
+            renderItem={this._renderItem}
+            numColumns={this.state.numCols}
+            extraData={this.state}
+          />
+        </View>
         {/* submit button */}
         <View style={Styles.bottom}>
           <IconBadge

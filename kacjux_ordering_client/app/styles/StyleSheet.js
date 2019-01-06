@@ -16,7 +16,8 @@ export default StyleSheet.create({
   },
   submitButton: {
     backgroundColor: "green",
-    width: 160
+    width: 160,
+    height: 60
   },
   submitText: {
     fontSize: 30
@@ -36,10 +37,14 @@ export default StyleSheet.create({
     width: "45%",
     position: "absolute",
     bottom: 0,
-    right: 0
+    right: 0,
+    height: 60
   },
-  itemContainer: {
-    width: "100%"
+  extraBottomSpace: {
+    height: 60
+  },
+  itemContentContainer: {
+    paddingBottom: 60
   },
   itemGrid: {
     flex: 1,

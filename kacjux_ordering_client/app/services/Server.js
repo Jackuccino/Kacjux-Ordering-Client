@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Alert } from "react-native";
 
 const apiPostNewOrder = "http://96.41.173.63:8080/api/orders/";
+const apiGetNewOrder = "http://96.41.173.63:8080/api/items/";
 
 exports.postNewOrder = params => {
   return fetch(apiPostNewOrder, {
@@ -13,29 +14,9 @@ exports.postNewOrder = params => {
     body: JSON.stringify(params)
   })
     .then(res => {
-      if (res.status === 201) {
-        Alert.alert(
-          "Alert Title",
-          res.status.toString(),
-          [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-          { cancelable: false }
-        );
-        return res.json();
-      } else {
-        Alert.alert(
-          "Alert Title",
-          res.status.toString(),
-          [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-          { cancelable: false }
-        );
-      }
+      return res.json();
     })
-    .catch(error => {
-      Alert.alert(
-        "Alert Title",
-        error.toString(),
-        [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-        { cancelable: false }
-      );
+    .catch(err => {
+      console.log(err);
     });
 };
