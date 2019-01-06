@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Alert } from "react-native";
 
-const apiPostNewOrder = "http://localhost:5000/api/orders/";
+const apiPostNewOrder = "http://96.41.173.63:8080/api/orders/";
 
 exports.postNewOrder = params => {
   return fetch(apiPostNewOrder, {

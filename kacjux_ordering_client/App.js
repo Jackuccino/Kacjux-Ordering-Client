@@ -16,38 +16,38 @@ export default class App extends Component {
     this.state = {
       data: [
         {
-          id: 1,
+          id: 2,
+          key: "Pot Stickers",
+          image: require("./app/assets/images/potsticker.jpg"),
+          price: 9.75,
+          amount: 0
+        },
+        {
+          id: 3,
           key: "Mar Far Chichen",
           image: require("./app/assets/images/mfch.png"),
           price: 10.25,
           amount: 0
         },
         {
-          id: 2,
+          id: 4,
           key: "Lemon Chichen",
           image: require("./app/assets/images/lemonch.jpg"),
           price: 11.75,
           amount: 0
         },
         {
-          id: 3,
+          id: 5,
           key: "Sesame Chichen",
           image: require("./app/assets/images/sesamech.jpg"),
           price: 11.5,
           amount: 0
         },
         {
-          id: 4,
+          id: 6,
           key: "Barbeque Pork",
           image: require("./app/assets/images/bbqpork.jpg"),
           price: 8.5,
-          amount: 0
-        },
-        {
-          id: 5,
-          key: "Pot Stickers",
-          image: require("./app/assets/images/potsticker.jpg"),
-          price: 9.75,
           amount: 0
         }
       ],
