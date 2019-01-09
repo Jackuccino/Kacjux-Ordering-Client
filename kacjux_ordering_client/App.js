@@ -8,55 +8,49 @@ import { Button } from "react-native-elements";
 import Icon from "react-native-vector-icons/Entypo";
 import IconBadge from "react-native-icon-badge";
 
-import { postNewOrder } from "./app/services/Server";
+import { postNewOrder, getAllItems } from "./app/services/Server";
+import { getImage } from "./app/helper/ImageHelper";
 
 export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: [
-        {
-          id: 2,
-          key: "Pot Stickers",
-          image: require("./app/assets/images/potsticker.jpg"),
-          price: 9.75,
-          amount: 0
-        },
-        {
-          id: 3,
-          key: "Mar Far Chichen",
-          image: require("./app/assets/images/mfch.png"),
-          price: 10.25,
-          amount: 0
-        },
-        {
-          id: 4,
-          key: "Lemon Chichen",
-          image: require("./app/assets/images/lemonch.jpg"),
-          price: 11.75,
-          amount: 0
-        },
-        {
-          id: 5,
-          key: "Sesame Chichen",
-          image: require("./app/assets/images/sesamech.jpg"),
-          price: 11.5,
-          amount: 0
-        },
-        {
-          id: 6,
-          key: "Barbeque Pork",
-          image: require("./app/assets/images/bbqpork.jpg"),
-          price: 8.5,
-          amount: 0
-        }
-      ],
+      data: [],
       numCols: 2,
       totalPrice: 0,
       totalItem: 0
     };
     this.timer = null;
+    this._getItems();
   }
+
+  _getItems = () => {
+    // api get
+    const result = getAllItems()
+      .then(res => {
+        if (res.result === "ok") {
+          const items = res.items;
+          items.forEach(item => {
+            const data = {
+              id: item.ItemId,
+              key: item.Key,
+              image: getImage(item.Key),
+              description: item.Description,
+              price: parseFloat(item.Price.replace("$", "")),
+              type: item.Type,
+              amount: 0
+            };
+            this.state.data.push(data);
+          });
+          this.setState({ data: this.state.data });
+        } else {
+          console.log("Get items failed.");
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
 
   // handler for adding an item
   _itemPlusHandler = id => {
@@ -120,6 +114,9 @@ export default class App extends Component {
           {/* Price */}
           <Text style={Styles.itemPrice}>${item.price.toFixed(2)}</Text>
         </View>
+        <View style={Styles.itemTitlePrice}>
+          <Text style={Styles.itemDescription}>{item.description}</Text>
+        </View>
         {/* - counter + */}
         <View style={Styles.itemCounterContainer}>
           <Button
@@ -165,8 +162,9 @@ export default class App extends Component {
         .then(res => {
           if (res.result === "ok") {
             // success
+            // go to cart view
           } else {
-            // failure
+            console.log("Place order failed.");
           }
         })
         .catch(err => {

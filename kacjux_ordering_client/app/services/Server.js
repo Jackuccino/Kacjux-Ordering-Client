@@ -1,8 +1,7 @@
-import React, { Component } from "react";
 import { Alert } from "react-native";
 
 const apiPostNewOrder = "http://96.41.173.63:8080/api/orders/";
-const apiGetNewOrder = "http://96.41.173.63:8080/api/items/";
+const apiGetAllItems = "http://96.41.173.63:8080/api/items/";
 
 exports.postNewOrder = params => {
   return fetch(apiPostNewOrder, {
@@ -13,6 +12,16 @@ exports.postNewOrder = params => {
     },
     body: JSON.stringify(params)
   })
+    .then(res => {
+      return res.json();
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
+
+exports.getAllItems = () => {
+  return fetch(apiGetAllItems)
     .then(res => {
       return res.json();
     })
