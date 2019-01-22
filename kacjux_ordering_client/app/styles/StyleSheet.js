@@ -6,27 +6,27 @@ export default StyleSheet.create({
     backgroundColor: "#F5FCFF"
   },
   title: {
+    color: "black",
     fontWeight: "bold",
-    fontSize: 50,
-    textAlign: "center"
+    fontSize: 20,
+    textAlign: "center",
+    margin: 5
   },
-  submitContainerView: {
+  headerView: {
+    flex: 1,
+    flexDirection: "row"
+  },
+  cartContainerView: {
     marginLeft: 0,
     marginRight: 0
   },
-  submitButton: {
+  cartButton: {
     backgroundColor: "green",
     width: 160,
     height: 60
   },
-  submitText: {
+  cartText: {
     fontSize: 30
-  },
-  top: {
-    height: "10%"
-  },
-  middle: {
-    height: "90%"
   },
   bottom: {
     flex: 1,
