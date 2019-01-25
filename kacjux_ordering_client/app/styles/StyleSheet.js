@@ -12,7 +12,7 @@ export default StyleSheet.create({
     textAlign: "center",
     margin: 5
   },
-  headerView: {
+  horizontalView: {
     flex: 1,
     flexDirection: "row"
   },
@@ -64,12 +64,14 @@ export default StyleSheet.create({
   },
   itemTitle: {
     flex: 1,
-    fontSize: 20
+    fontSize: 20,
+    alignSelf: "center"
   },
   itemPrice: {
     flex: 1,
     textAlign: "right",
-    fontSize: 20
+    fontSize: 20,
+    alignSelf: "center"
   },
   itemCounterContainer: {
     flex: 1,
@@ -106,5 +108,10 @@ export default StyleSheet.create({
   totalPrice: {
     fontSize: 25,
     textAlign: "left"
+  },
+  cartItemImage: {
+    width: 40,
+    height: 40,
+    margin: 5
   }
 });

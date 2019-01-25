@@ -13,7 +13,7 @@ export default class HomeScreen extends Component {
   static navigationOptions = {
     headerTitle: <Text style={Styles.title}>Table# 1</Text>,
     headerRight: (
-      <View style={Styles.headerView}>
+      <View style={Styles.horizontalView}>
         <Button title="My Profile" />
         <Button title="Login" />
         <Button title="Sign up" />
@@ -48,7 +48,7 @@ export default class HomeScreen extends Component {
               description: item.Description,
               price: parseFloat(item.Price.replace("$", "")),
               type: item.Type,
-              amount: 0
+              quantity: 0
             };
             this.state.data.push(data);
           });
@@ -65,7 +65,7 @@ export default class HomeScreen extends Component {
   // handler for adding an item
   _itemPlusHandler = id => {
     const data = this.state.data.find(d => d.id === id);
-    data.amount++;
+    data.quantity++;
     this._addTotalItem();
     this._addTotalPrice(data.price);
     this.setState({ data: this.state.data });
@@ -76,8 +76,8 @@ export default class HomeScreen extends Component {
   // handler for removing an item
   _itemMinusHandler = id => {
     const data = this.state.data.find(d => d.id === id);
-    if (data.amount > 0) {
-      data.amount--;
+    if (data.quantity > 0) {
+      data.quantity--;
       this._minusTotalItem();
       this._minusTotalPrice(data.price);
     }
@@ -112,12 +112,7 @@ export default class HomeScreen extends Component {
     return (
       <View style={Styles.itemGrid}>
         {/* image */}
-        <Image
-          source={item.image}
-          height="100"
-          width="200"
-          style={Styles.itemImage}
-        />
+        <Image source={item.image} style={Styles.itemImage} />
         <View style={Styles.itemTitlePrice}>
           {/* title */}
           <Text style={Styles.itemTitle}>{item.key}</Text>
@@ -136,7 +131,7 @@ export default class HomeScreen extends Component {
             onPressOut={this._stopTimer}
           />
           <View style={Styles.itemNumber}>
-            <Text> {item.amount} </Text>
+            <Text> {item.quantity} </Text>
           </View>
           <Button
             title="+"
@@ -151,7 +146,7 @@ export default class HomeScreen extends Component {
 
   // return a list of selected items
   _getSelectedItems = () => {
-    return this.state.data.filter(d => d.amount != 0);
+    return this.state.data.filter(d => d.quantity != 0);
   };
 
   // return a string of current day+month
