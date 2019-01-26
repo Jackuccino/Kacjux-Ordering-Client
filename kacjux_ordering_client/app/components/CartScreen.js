@@ -1,18 +1,45 @@
 import React, { Component } from "react";
-import { Text, View, FlatList, Image } from "react-native";
-import { Button } from "react-native-elements";
+import {
+  Text,
+  View,
+  FlatList,
+  Image,
+  TextInput,
+  ScrollView
+} from "react-native";
+import { Button, Icon } from "react-native-elements";
+import IconBadge from "react-native-icon-badge";
 import Styles from "../styles/StyleSheet";
 
+import { postNewOrder } from "../services/Server";
+
 export default class CartScreen extends Component {
-  static navigationOptions = {
-    headerTitle: <Text style={Styles.title}>Cart</Text>
-  };
+  // Header bar
+  static navigationOptions = ({ navigation }) => ({
+    headerTitle: <Text style={Styles.title}>Cart</Text>,
+    headerLeft: (
+      <Icon
+        name={"arrow-back"}
+        onPress={() => {
+          navigation.goBack();
+          navigation.state.params.onBack(
+            navigation.getParam("orderItems", null),
+            navigation.getParam("status", 0)
+          );
+        }}
+      />
+    )
+  });
 
   constructor(props) {
     super(props);
+    const { navigation } = this.props;
     this.state = {
-      orderItems: this.props.navigation.getParam("orderItems", null),
-      orderNo: this.props.navigation.getParam("orderNo", null)
+      orderItems: navigation.getParam("orderItems", null),
+      orderNo: navigation.getParam("orderNo", null),
+      totalItem: navigation.getParam("totalItem", 0),
+      totalPrice: navigation.getParam("totalPrice", 0),
+      note: ""
     };
   }
 
@@ -24,7 +51,7 @@ export default class CartScreen extends Component {
       const quantity = item.quantity;
       const totalPrice = item.price * quantity;
       const orderItem = item.id;
-      const note = null;
+      const note = this.state.note;
 
       const newOrder = {
         OrderNo: this.state.orderNo,
@@ -47,28 +74,35 @@ export default class CartScreen extends Component {
           console.log(err);
         });
     });
+
+    const { navigation } = this.props;
+    navigation.goBack();
+    // 1 means order submitted
+    navigation.state.params.onBack(navigation.getParam("orderItems", null), 1);
   };
 
   // handler for adding an item
   _itemPlusHandler = id => {
-    const data = this.state.data.find(d => d.id === id);
+    const data = this.state.orderItems.find(d => d.id === id);
     data.quantity++;
     this._addTotalItem();
     this._addTotalPrice(data.price);
-    this.setState({ data: this.state.data });
+    this.setState({ orderItems: this.state.orderItems });
+    this.props.navigation.setParams({ orderItems: this.state.orderItems });
     // increment recursively when holding button
     this.timer = setTimeout(this._itemPlusHandler.bind(this, id), 85);
   };
 
   // handler for removing an item
   _itemMinusHandler = id => {
-    const data = this.state.data.find(d => d.id === id);
+    const data = this.state.orderItems.find(d => d.id === id);
     if (data.quantity > 0) {
       data.quantity--;
       this._minusTotalItem();
       this._minusTotalPrice(data.price);
     }
-    this.setState({ data: this.state.data });
+    this.setState({ orderItems: this.state.orderItems });
+    this.props.navigation.setParams({ orderItems: this.state.orderItems });
     // increment recursively when holding button
     this.timer = setTimeout(this._itemMinusHandler.bind(this, id), 85);
   };
@@ -78,10 +112,44 @@ export default class CartScreen extends Component {
     clearTimeout(this.timer);
   };
 
+  _addTotalPrice = price => {
+    this.setState({ totalPrice: this.state.totalPrice + price });
+  };
+
+  _minusTotalPrice = price => {
+    this.setState({ totalPrice: this.state.totalPrice - price });
+  };
+
+  _addTotalItem = () => {
+    this.setState({ totalItem: this.state.totalItem + 1 });
+  };
+
+  _minusTotalItem = () => {
+    this.setState({ totalItem: this.state.totalItem - 1 });
+  };
+
+  // delete items in cart
+  _deleteItem = id => {
+    const item = this.state.orderItems.find(i => i.id == id);
+    if (this.state.totalItem > 0) {
+      this.state.totalItem -= item.quantity;
+    }
+    if (this.state.totalPrice > 0) {
+      this.state.totalPrice -= (item.quantity * item.price).toFixed(2);
+    }
+    item.quantity = 0;
+    this.setState({
+      orderItems: this.state.orderItems,
+      totalItem: this.state.totalItem,
+      totalPrice: this.state.totalPrice
+    });
+    this.props.navigation.setParams({ orderItems: this.state.orderItems });
+  };
+
   // rendering data for item list
   _renderItem = ({ item }) => {
-    return (
-      <View style={Styles.horizontalView}>
+    return item.quantity == 0 ? null : (
+      <View style={Styles.cartItemList}>
         {/* image */}
         <Image source={item.image} style={Styles.cartItemImage} />
         {/* item title */}
@@ -93,7 +161,7 @@ export default class CartScreen extends Component {
         {/* - counter + */}
         <View style={Styles.itemCounterContainer}>
           <Button
-            title="-"
+            icon={{ name: "remove" }}
             buttonStyle={Styles.itemButton}
             onPressIn={this._itemMinusHandler.bind(this, item.id)}
             onPressOut={this._stopTimer}
@@ -102,22 +170,82 @@ export default class CartScreen extends Component {
             <Text> {item.quantity} </Text>
           </View>
           <Button
-            title="+"
+            icon={{ name: "add" }}
             buttonStyle={Styles.itemButton}
             onPressIn={this._itemPlusHandler.bind(this, item.id)}
             onPressOut={this._stopTimer}
           />
         </View>
+        {/* Trash Icon (delete) */}
+        <Icon
+          name="delete-outline"
+          color="red"
+          type="material-community"
+          size={40}
+          onPress={this._deleteItem.bind(this, item.id)}
+        />
       </View>
     );
   };
 
   render() {
     return (
-      <View>
-        <FlatList data={this.state.orderItems} renderItem={this._renderItem} />
-        <Text>{this.state.orderNo}</Text>
-      </View>
+      <ScrollView contentContainerStyle={Styles.scrollViewStyle}>
+        {/* cart item list */}
+        <View>
+          <FlatList
+            contentContainerStyle={Styles.itemContentContainer}
+            data={this.state.orderItems}
+            renderItem={this._renderItem}
+            extraData={this.state}
+          />
+        </View>
+        {/* cart note */}
+        <TextInput
+          style={Styles.textAreaContainer}
+          underlineColorAndroid="transparent"
+          placeholder="Special note here..."
+          placeholderTextColor="grey"
+          multiline={true}
+          numberOfLines={10}
+          onChangeText={text => {
+            this.setState({ note: text });
+          }}
+          value={this.state.note}
+          scrollEnabled={true}
+        />
+        {/* cart button bar */}
+        <View style={Styles.bottom}>
+          <IconBadge
+            MainElement={
+              <Icon
+                name="cart-outline"
+                size={40}
+                type="material-community"
+                color="white"
+                iconStyle={Styles.cartIcon}
+              />
+            }
+            BadgeElement={
+              <Text style={Styles.iconBadgeText}>{this.state.totalItem}</Text>
+            }
+            IconBadgeStyle={Styles.iconBadge}
+            Hidden={this.state.totalItem === 0}
+            extraData={this.state}
+          />
+          <Text style={Styles.totalPrice}>
+            ${this.state.totalPrice.toFixed(2)}
+          </Text>
+          <Button
+            disabled={this.state.totalItem === 0}
+            title="Submit"
+            buttonStyle={Styles.submitButton}
+            textStyle={Styles.cartText}
+            containerViewStyle={Styles.cartContainerView}
+            onPress={this._submitOrdersHandler}
+          />
+        </View>
+      </ScrollView>
     );
   }
 }

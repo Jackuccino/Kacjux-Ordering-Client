@@ -21,7 +21,7 @@ export default StyleSheet.create({
     marginRight: 0
   },
   cartButton: {
-    backgroundColor: "green",
+    backgroundColor: "red",
     width: 160,
     height: 60
   },
@@ -33,7 +33,7 @@ export default StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "lightgrey",
+    backgroundColor: "grey",
     width: "45%",
     position: "absolute",
     bottom: 0,
@@ -60,7 +60,8 @@ export default StyleSheet.create({
   },
   itemImage: {
     height: 300,
-    width: "100%"
+    width: "100%",
+    opacity: 0.9
   },
   itemTitle: {
     flex: 1,
@@ -91,7 +92,10 @@ export default StyleSheet.create({
     width: "auto",
     borderRadius: 30,
     width: 40,
-    height: 40
+    height: 40,
+    padding: 0,
+    paddingLeft: 10,
+    backgroundColor: "#007bff"
   },
   iconBadgeText: {
     color: "white"
@@ -102,16 +106,39 @@ export default StyleSheet.create({
     backgroundColor: "red"
   },
   cartIcon: {
-    marginLeft: 50,
-    marginRight: 15
+    marginLeft: 45,
+    marginRight: 12
   },
   totalPrice: {
     fontSize: 25,
-    textAlign: "left"
+    textAlign: "left",
+    color: "white"
   },
   cartItemImage: {
     width: 40,
     height: 40,
     margin: 5
+  },
+  submitButton: {
+    backgroundColor: "green",
+    width: 160,
+    height: 60
+  },
+  cartItemList: {
+    flex: 1,
+    flexDirection: "row",
+    marginBottom: 5
+  },
+  textAreaContainer: {
+    borderColor: "lightgrey",
+    borderWidth: 1,
+    padding: 5,
+    margin: 20,
+    textAlignVertical: "top"
+  },
+  scrollViewStyle: {
+    flex: 1,
+    justifyContent: "space-between",
+    paddingBottom: 60
   }
 });
