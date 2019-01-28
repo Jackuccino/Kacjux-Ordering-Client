@@ -28,7 +28,8 @@ export default class HomeScreen extends Component {
       totalPrice: 0,
       totalItem: 0,
       tableNo: 1,
-      status: 0
+      status: 0,
+      note: ""
     };
     this.timer = null;
     this._getItems();
@@ -63,7 +64,7 @@ export default class HomeScreen extends Component {
   };
 
   // Update quantity and total prices after changing those in the cart
-  _updateData = (data, status) => {
+  _updateData = (data, status, note) => {
     var totalItem = 0;
     var totalPrice = 0;
     data.forEach(newData => {
@@ -80,7 +81,8 @@ export default class HomeScreen extends Component {
       data: this.state.data,
       totalItem: totalItem,
       totalPrice: totalPrice,
-      status: status
+      status: status,
+      note: note
     });
   };
 
@@ -228,6 +230,7 @@ export default class HomeScreen extends Component {
             ${this.state.totalPrice.toFixed(2)}
           </Text>
           {this.state.status == 0 ? (
+            //  Go to Cart View
             <Button
               disabled={this.state.totalItem === 0}
               title="Cart"
@@ -240,27 +243,20 @@ export default class HomeScreen extends Component {
                   orderNo: this.state.tableNo.toString() + this._getDate(),
                   totalItem: this.state.totalItem,
                   totalPrice: this.state.totalPrice,
+                  note: this.state.note,
                   onBack: this._updateData
                 })
               }
             />
           ) : (
+            //Go to Order View
             <Button
               disabled={this.state.totalItem === 0}
               title="Order"
               buttonStyle={Styles.cartButton}
               textStyle={Styles.cartText}
               containerViewStyle={Styles.cartContainerView}
-              onPress={() =>
-                navigate("Cart", {
-                  orderItems: this._getSelectedItems(),
-                  orderNo: this.state.tableNo.toString() + this._getDate(),
-                  totalItem: this.state.totalItem,
-                  totalPrice: this.state.totalPrice,
-                  status: this.state.status,
-                  onBack: this._updateData
-                })
-              }
+              onPress={() => navigate("OrderView", {})}
             />
           )}
         </View>

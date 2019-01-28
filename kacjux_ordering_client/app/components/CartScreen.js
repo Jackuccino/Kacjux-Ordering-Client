@@ -24,7 +24,8 @@ export default class CartScreen extends Component {
           navigation.goBack();
           navigation.state.params.onBack(
             navigation.getParam("orderItems", null),
-            navigation.getParam("status", 0)
+            0,
+            navigation.getParam("note", "")
           );
         }}
       />
@@ -38,8 +39,7 @@ export default class CartScreen extends Component {
       orderItems: navigation.getParam("orderItems", null),
       orderNo: navigation.getParam("orderNo", null),
       totalItem: navigation.getParam("totalItem", 0),
-      totalPrice: navigation.getParam("totalPrice", 0),
-      note: ""
+      totalPrice: navigation.getParam("totalPrice", 0)
     };
   }
 
@@ -51,7 +51,7 @@ export default class CartScreen extends Component {
       const quantity = item.quantity;
       const totalPrice = item.price * quantity;
       const orderItem = item.id;
-      const note = this.state.note;
+      const note = navigation.getParam("note", "");
 
       const newOrder = {
         OrderNo: this.state.orderNo,
@@ -78,7 +78,11 @@ export default class CartScreen extends Component {
     const { navigation } = this.props;
     navigation.goBack();
     // 1 means order submitted
-    navigation.state.params.onBack(navigation.getParam("orderItems", null), 1);
+    navigation.state.params.onBack(
+      navigation.getParam("orderItems", null),
+      1,
+      ""
+    );
   };
 
   // handler for adding an item
@@ -189,6 +193,7 @@ export default class CartScreen extends Component {
   };
 
   render() {
+    const { navigation } = this.props;
     return (
       <ScrollView contentContainerStyle={Styles.scrollViewStyle}>
         <ScrollView>
@@ -213,9 +218,9 @@ export default class CartScreen extends Component {
             numberOfLines={10}
             maxLength={999}
             onChangeText={text => {
-              this.setState({ note: text });
+              navigation.setParams({ note: text });
             }}
-            value={this.state.note}
+            value={navigation.getParam("note", "")}
             scrollEnabled={true}
           />
         </View>
