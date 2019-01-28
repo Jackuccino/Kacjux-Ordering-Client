@@ -191,29 +191,34 @@ export default class CartScreen extends Component {
   render() {
     return (
       <ScrollView contentContainerStyle={Styles.scrollViewStyle}>
-        {/* cart item list */}
+        <ScrollView>
+          {/* cart item list */}
+          <View>
+            <FlatList
+              contentContainerStyle={Styles.itemContentContainer}
+              data={this.state.orderItems}
+              renderItem={this._renderItem}
+              extraData={this.state}
+            />
+          </View>
+        </ScrollView>
         <View>
-          <FlatList
-            contentContainerStyle={Styles.itemContentContainer}
-            data={this.state.orderItems}
-            renderItem={this._renderItem}
-            extraData={this.state}
+          {/* cart note */}
+          <TextInput
+            style={Styles.textAreaContainer}
+            underlineColorAndroid="transparent"
+            placeholder="Special note here..."
+            placeholderTextColor="grey"
+            multiline={true}
+            numberOfLines={10}
+            maxLength={999}
+            onChangeText={text => {
+              this.setState({ note: text });
+            }}
+            value={this.state.note}
+            scrollEnabled={true}
           />
         </View>
-        {/* cart note */}
-        <TextInput
-          style={Styles.textAreaContainer}
-          underlineColorAndroid="transparent"
-          placeholder="Special note here..."
-          placeholderTextColor="grey"
-          multiline={true}
-          numberOfLines={10}
-          onChangeText={text => {
-            this.setState({ note: text });
-          }}
-          value={this.state.note}
-          scrollEnabled={true}
-        />
         {/* cart button bar */}
         <View style={Styles.bottom}>
           <IconBadge

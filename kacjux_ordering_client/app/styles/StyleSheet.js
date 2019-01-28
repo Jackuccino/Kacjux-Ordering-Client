@@ -60,8 +60,7 @@ export default StyleSheet.create({
   },
   itemImage: {
     height: 300,
-    width: "100%",
-    opacity: 0.9
+    width: "100%"
   },
   itemTitle: {
     flex: 1,
@@ -134,11 +133,12 @@ export default StyleSheet.create({
     borderWidth: 1,
     padding: 5,
     margin: 20,
-    textAlignVertical: "top"
+    textAlignVertical: "top",
+    height: 150
   },
   scrollViewStyle: {
     flex: 1,
     justifyContent: "space-between",
-    paddingBottom: 60
+    paddingBottom: 50
   }
 });
