@@ -155,7 +155,11 @@ export default class CartScreen extends Component {
     return item.quantity == 0 ? null : (
       <View style={Styles.cartItemList}>
         {/* image */}
-        <Image source={item.image} style={Styles.cartItemImage} />
+        <Image
+          borderRadius={50}
+          source={item.image}
+          style={Styles.cartItemImage}
+        />
         {/* item title */}
         <Text style={Styles.itemTitle}>{item.key}</Text>
         {/* Price */}

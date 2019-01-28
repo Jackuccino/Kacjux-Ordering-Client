@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Alert, Text, View, Image, FlatList } from "react-native";
+import { Text, View, Image, FlatList, SectionList } from "react-native";
 
 import { Button, Icon } from "react-native-elements";
 import IconBadge from "react-native-icon-badge";
@@ -192,14 +192,22 @@ export default class HomeScreen extends Component {
     );
   };
 
+  // scroll to item
+  _scrollToIndex = index => {
+    this.flatListRef.scrollToIndex({ animated: true, index: index });
+  };
+
   // Main()
   render() {
     const { navigate } = this.props.navigation;
     return (
       <View style={Styles.container}>
         {/* item list */}
-        <View>
+        <View style={Styles.horizontalView}>
           <FlatList
+            ref={ref => {
+              this.flatListRef = ref;
+            }}
             contentContainerStyle={Styles.itemContentContainer}
             data={this.state.data}
             renderItem={this._renderItem}
