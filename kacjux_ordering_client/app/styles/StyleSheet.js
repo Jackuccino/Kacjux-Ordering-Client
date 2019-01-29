@@ -6,7 +6,6 @@ export default StyleSheet.create({
     backgroundColor: "#F5FCFF"
   },
   title: {
-    color: "black",
     fontWeight: "bold",
     fontSize: 20,
     textAlign: "center",
@@ -22,8 +21,8 @@ export default StyleSheet.create({
   },
   cartButton: {
     backgroundColor: "red",
-    width: 160,
-    height: 60
+    width: 150,
+    height: 70
   },
   cartText: {
     fontSize: 30
@@ -34,17 +33,17 @@ export default StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "grey",
-    width: "45%",
+    width: "38%",
     position: "absolute",
     bottom: 0,
     right: 0,
-    height: 60
+    height: 70
   },
   extraBottomSpace: {
-    height: 60
+    height: 70
   },
   itemContentContainer: {
-    paddingBottom: 60
+    paddingBottom: 70
   },
   itemGrid: {
     flex: 1,
@@ -65,6 +64,7 @@ export default StyleSheet.create({
   itemTitle: {
     flex: 1,
     fontSize: 20,
+    fontWeight: "bold",
     alignSelf: "center"
   },
   itemPrice: {
@@ -120,8 +120,8 @@ export default StyleSheet.create({
   },
   submitButton: {
     backgroundColor: "green",
-    width: 160,
-    height: 60
+    width: 150,
+    height: 70
   },
   cartItemList: {
     flex: 1,
@@ -139,6 +139,23 @@ export default StyleSheet.create({
   scrollViewStyle: {
     flex: 1,
     justifyContent: "space-between",
-    paddingBottom: 50
+    paddingBottom: 70
+  },
+  itemInvisible: {
+    backgroundColor: "transparent"
+  },
+  sideMenuBarContainer: {
+    width: 150
+  },
+  menuContainer: {
+    flex: 1
+  },
+  menuHeader: {
+    fontSize: 20,
+    textAlign: "center",
+    borderBottomWidth: 1,
+    borderColor: "grey",
+    fontWeight: "bold",
+    padding: 5
   }
 });

@@ -7,6 +7,7 @@ import IconBadge from "react-native-icon-badge";
 import Styles from "../styles/StyleSheet";
 import { getAllItems } from "../services/Server";
 import { getImage } from "../helper/ImageHelper";
+import CategoryMenu from "./CategoryMenu";
 
 export default class HomeScreen extends Component {
   static navigationOptions = {
@@ -51,7 +52,16 @@ export default class HomeScreen extends Component {
               type: item.Type,
               quantity: 0
             };
+            // For FlatList
             this.state.data.push(data);
+
+            // For SectionList
+            // const section = this.state.data.find(d => d.title == data.type);
+            // if (section === null) {
+            //   section = { title: data.type, data: [] };
+            //   this.state.data.push(section);
+            // }
+            // section.data.push(data);
           });
           this.setState({ data: this.state.data });
         } else {
@@ -68,7 +78,7 @@ export default class HomeScreen extends Component {
     var totalItem = 0;
     var totalPrice = 0;
     data.forEach(newData => {
-      const oldData = this.state.data.find(d => d.id == newData.id);
+      const oldData = this.state.data.find(d => d.id === newData.id);
       oldData.quantity = newData.quantity;
     });
 
@@ -133,6 +143,9 @@ export default class HomeScreen extends Component {
 
   // rendering data for item list
   _renderItem = ({ item }) => {
+    if (item.type === "empty") {
+      return <View disabled style={[Styles.itemGrid, Styles.itemInvisible]} />;
+    }
     return (
       <View style={Styles.itemGrid}>
         {/* image */}
@@ -178,7 +191,7 @@ export default class HomeScreen extends Component {
 
   // return a list of selected items
   _getSelectedItems = () => {
-    return this.state.data.filter(d => d.quantity != 0);
+    return this.state.data.filter(d => d.quantity !== 0);
   };
 
   // return a string of current day+month
@@ -192,9 +205,27 @@ export default class HomeScreen extends Component {
     );
   };
 
-  // scroll to item
-  _scrollToIndex = index => {
-    this.flatListRef.scrollToIndex({ animated: true, index: index });
+  _formatData = (data, numColumns) => {
+    const numberOfFullRows = Math.floor(data.length / numColumns);
+
+    let numberOfElementsLastRow = data.length - numberOfFullRows * numColumns;
+    while (
+      numberOfElementsLastRow !== numColumns &&
+      numberOfElementsLastRow !== 0
+    ) {
+      data.push({
+        id: -1,
+        key: "",
+        image: null,
+        description: "",
+        price: 0,
+        type: "empty",
+        quantity: 0
+      });
+      numberOfElementsLastRow++;
+    }
+
+    return data;
   };
 
   // Main()
@@ -203,18 +234,13 @@ export default class HomeScreen extends Component {
     return (
       <View style={Styles.container}>
         {/* item list */}
-        <View style={Styles.horizontalView}>
-          <FlatList
-            ref={ref => {
-              this.flatListRef = ref;
-            }}
-            contentContainerStyle={Styles.itemContentContainer}
-            data={this.state.data}
-            renderItem={this._renderItem}
-            numColumns={this.state.numCols}
-            extraData={this.state}
-          />
-        </View>
+        <CategoryMenu
+          contentContainerStyle={Styles.itemContentContainer}
+          data={this._formatData(this.state.data, this.state.numCols)}
+          renderItem={this._renderItem}
+          numColumns={this.state.numCols}
+          extraData={this.state}
+        />
         {/* cart button bar */}
         <View style={Styles.bottom}>
           <IconBadge
