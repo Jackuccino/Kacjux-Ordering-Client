@@ -24,7 +24,28 @@ export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: [],
+      titleData: [
+        { key: "APPETIZERS" },
+        { key: "SELECTED DELICIOUS CUISINE" },
+        { key: "FAMILY STYLE DINNERS" },
+        { key: "HOT SPICY & HOUSE SPECIALS" },
+        { key: "COMBINATION PLATES" },
+        { key: "VEGETABLE & TOFU DISHES" },
+        { key: "RICE" },
+        { key: "CHOW MEIN OR CHOP SUEY" },
+        { key: "EGG FOO YOUNG" },
+        { key: "SOUP, WON TONS & NOODLES" },
+        { key: "FOR OUR LITTLE FRIENDS" },
+        { key: "FROM THE BROILER" },
+        { key: "FROM THE GRILL" },
+        { key: "SANDWICHES" },
+        { key: "SALAD" },
+        { key: "SOUP" },
+        { key: "DESSERT" },
+        { key: "BEVERAGE" },
+        { key: "LUNCH SPECIAL" }
+      ],
+      itemData: [],
       numCols: 2,
       totalPrice: 0,
       totalItem: 0,
@@ -53,7 +74,7 @@ export default class HomeScreen extends Component {
               quantity: 0
             };
             // For FlatList
-            this.state.data.push(data);
+            this.state.itemData.push(data);
 
             // For SectionList
             // const section = this.state.data.find(d => d.title == data.type);
@@ -63,7 +84,7 @@ export default class HomeScreen extends Component {
             // }
             // section.data.push(data);
           });
-          this.setState({ data: this.state.data });
+          this.setState({ data: this.state.itemData });
         } else {
           console.log("Get items failed.");
         }
@@ -78,17 +99,17 @@ export default class HomeScreen extends Component {
     var totalItem = 0;
     var totalPrice = 0;
     data.forEach(newData => {
-      const oldData = this.state.data.find(d => d.id === newData.id);
+      const oldData = this.state.itemData.find(d => d.id === newData.id);
       oldData.quantity = newData.quantity;
     });
 
-    this.state.data.forEach(newData => {
+    this.state.itemData.forEach(newData => {
       totalItem += newData.quantity;
       totalPrice += newData.quantity * newData.price;
     });
 
     this.setState({
-      data: this.state.data,
+      data: this.state.itemData,
       totalItem: totalItem,
       totalPrice: totalPrice,
       status: status,
@@ -98,24 +119,24 @@ export default class HomeScreen extends Component {
 
   // handler for adding an item
   _itemPlusHandler = id => {
-    const data = this.state.data.find(d => d.id === id);
+    const data = this.state.itemData.find(d => d.id === id);
     data.quantity++;
     this._addTotalItem();
     this._addTotalPrice(data.price);
-    this.setState({ data: this.state.data });
+    this.setState({ data: this.state.itemData });
     // increment recursively when holding button
     this.timer = setTimeout(this._itemPlusHandler.bind(this, id), 85);
   };
 
   // handler for removing an item
   _itemMinusHandler = id => {
-    const data = this.state.data.find(d => d.id === id);
+    const data = this.state.itemData.find(d => d.id === id);
     if (data.quantity > 0) {
       data.quantity--;
       this._minusTotalItem();
       this._minusTotalPrice(data.price);
     }
-    this.setState({ data: this.state.data });
+    this.setState({ data: this.state.itemData });
     // increment recursively when holding button
     this.timer = setTimeout(this._itemMinusHandler.bind(this, id), 85);
   };
@@ -191,7 +212,7 @@ export default class HomeScreen extends Component {
 
   // return a list of selected items
   _getSelectedItems = () => {
-    return this.state.data.filter(d => d.quantity !== 0);
+    return this.state.itemData.filter(d => d.quantity !== 0);
   };
 
   // return a string of current day+month
@@ -205,6 +226,7 @@ export default class HomeScreen extends Component {
     );
   };
 
+  // Add empty object to the last row if uneven
   _formatData = (data, numColumns) => {
     const numberOfFullRows = Math.floor(data.length / numColumns);
 
@@ -236,7 +258,8 @@ export default class HomeScreen extends Component {
         {/* item list */}
         <CategoryMenu
           contentContainerStyle={Styles.itemContentContainer}
-          data={this._formatData(this.state.data, this.state.numCols)}
+          titleData={this.state.titleData}
+          itemData={this._formatData(this.state.itemData, this.state.numCols)}
           renderItem={this._renderItem}
           numColumns={this.state.numCols}
           extraData={this.state}

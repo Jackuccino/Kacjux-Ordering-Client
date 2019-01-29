@@ -41,27 +41,7 @@ export class CategoryMenu extends Component {
         <View style={Styles.sideMenuBarContainer}>
           <ScrollView>
             <FlatList
-              data={[
-                { key: "APPETIZERS" },
-                { key: "SELECTED DELICIOUS CUISINE" },
-                { key: "FAMILY STYLE DINNERS" },
-                { key: "HOT SPICY & HOUSE SPECIALS" },
-                { key: "COMBINATION PLATES" },
-                { key: "VEGETABLE & TOFU DISHES" },
-                { key: "RICE" },
-                { key: "CHOW MEIN OR CHOP SUEY" },
-                { key: "EGG FOO YOUNG" },
-                { key: "SOUP, WON TONS & NOODLES" },
-                { key: "FOR OUR LITTLE FRIENDS" },
-                { key: "FROM THE BROILER" },
-                { key: "FROM THE GRILL" },
-                { key: "SANDWICHES" },
-                { key: "SALAD" },
-                { key: "SOUP" },
-                { key: "DESSERT" },
-                { key: "BEVERAGE" },
-                { key: "LUNCH SPECIAL" }
-              ]}
+              data={this.props.titleData}
               renderItem={this._renderSideBarMenuItem}
             />
           </ScrollView>
@@ -72,7 +52,7 @@ export class CategoryMenu extends Component {
               this.flatListRef = ref;
             }}
             contentContainerStyle={this.props.contentContainerStyle}
-            data={this.props.data}
+            data={this.props.itemData}
             renderItem={this.props.renderItem}
             numColumns={this.props.numColumns}
             extraData={this.props.extraData}
