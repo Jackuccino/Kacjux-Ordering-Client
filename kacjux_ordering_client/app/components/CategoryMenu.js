@@ -13,9 +13,7 @@ export class CategoryMenu extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      //
-    };
+    this.state = {};
   }
 
   // scroll to item
@@ -27,7 +25,10 @@ export class CategoryMenu extends Component {
     return (
       <TouchableHighlight
         underlayColor={"lightgrey"}
-        onPress={this._scrollToIndex.bind(this, Math.random())}
+        onPress={this._scrollToIndex.bind(
+          this,
+          Math.floor((Math.random() / Math.random()) * 3) % 2 // tempo
+        )}
       >
         <Text style={Styles.menuHeader}>{item.key}</Text>
       </TouchableHighlight>
