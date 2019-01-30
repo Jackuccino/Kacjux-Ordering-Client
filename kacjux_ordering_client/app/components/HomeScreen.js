@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, Image, FlatList, SectionList } from "react-native";
+import { Text, View, Image, Alert } from "react-native";
 
 import { Button, Icon } from "react-native-elements";
 import IconBadge from "react-native-icon-badge";
@@ -24,27 +24,7 @@ export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      titleData: [
-        { key: "APPETIZERS" },
-        { key: "SELECTED DELICIOUS CUISINE" },
-        { key: "FAMILY STYLE DINNERS" },
-        { key: "HOT SPICY & HOUSE SPECIALS" },
-        { key: "COMBINATION PLATES" },
-        { key: "VEGETABLE & TOFU DISHES" },
-        { key: "RICE" },
-        { key: "CHOW MEIN OR CHOP SUEY" },
-        { key: "EGG FOO YOUNG" },
-        { key: "SOUP, WON TONS & NOODLES" },
-        { key: "FOR OUR LITTLE FRIENDS" },
-        { key: "FROM THE BROILER" },
-        { key: "FROM THE GRILL" },
-        { key: "SANDWICHES" },
-        { key: "SALAD" },
-        { key: "SOUP" },
-        { key: "DESSERT" },
-        { key: "BEVERAGE" },
-        { key: "LUNCH SPECIAL" }
-      ],
+      titleData: [{ key: "" }],
       itemData: [],
       numCols: 2,
       totalPrice: 0,
@@ -75,16 +55,60 @@ export default class HomeScreen extends Component {
             };
             // For FlatList
             this.state.itemData.push(data);
+            if (
+              this.state.titleData.filter(td => td.key === data.type).length ===
+              0
+            ) {
+              this.state.titleData.push({ key: data.type });
+            }
 
             // For SectionList
-            // const section = this.state.data.find(d => d.title == data.type);
+            // const section = this.state.itemData.find(d => d.title == data.type);
             // if (section === null) {
             //   section = { title: data.type, data: [] };
-            //   this.state.data.push(section);
+            //   this.state.itemData.push(section);
             // }
             // section.data.push(data);
           });
-          this.setState({ data: this.state.itemData });
+
+          // Sort side menu titles
+          for (let i = 0; i < this.state.titleData.length - 1; i++) {
+            const title = this.state.titleData[i];
+            const titleNext = this.state.titleData[i + 1];
+            if (title.key > titleNext.key) {
+              this.state.titleData = this.state.titleData.filter(
+                td => td.key != title.key
+              );
+              this.state.titleData.push({ key: title.key });
+              i = 0;
+            }
+          }
+
+          // Sort dishes
+          for (let i = 0; i < this.state.itemData.length - 1; i++) {
+            const data = this.state.itemData[i];
+            const dataNext = this.state.itemData[i + 1];
+            if (data.type > dataNext.type) {
+              this.state.itemData = this.state.itemData.filter(
+                td => td.key != data.key
+              );
+              this.state.itemData.push({
+                id: data.id,
+                key: data.key,
+                image: data.image,
+                description: data.description,
+                price: data.price,
+                type: data.type,
+                quantity: data.quantity
+              });
+              i = 0;
+            }
+          }
+
+          this.setState({
+            data: this.state.itemData,
+            titleData: this.state.titleData.filter(td => td.key !== "")
+          });
         } else {
           console.log("Get items failed.");
         }

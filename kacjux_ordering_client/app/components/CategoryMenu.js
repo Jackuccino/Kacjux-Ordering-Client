@@ -4,7 +4,8 @@ import {
   FlatList,
   Text,
   ScrollView,
-  TouchableHighlight
+  TouchableHighlight,
+  Alert
 } from "react-native";
 import Styles from "../styles/StyleSheet";
 
@@ -28,9 +29,7 @@ export class CategoryMenu extends Component {
         underlayColor={"lightgrey"}
         onPress={this._scrollToIndex.bind(this, Math.random())}
       >
-        <Text style={Styles.menuHeader} selectionColor="yellow">
-          {item.key}
-        </Text>
+        <Text style={Styles.menuHeader}>{item.key}</Text>
       </TouchableHighlight>
     );
   };

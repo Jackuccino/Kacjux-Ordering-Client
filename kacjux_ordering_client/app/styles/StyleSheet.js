@@ -157,5 +157,8 @@ export default StyleSheet.create({
     borderColor: "grey",
     fontWeight: "bold",
     padding: 5
+  },
+  defaultBackgroundColor: {
+    backgroundColor: "#f5fcff"
   }
 });
