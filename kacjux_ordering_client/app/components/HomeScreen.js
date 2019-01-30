@@ -24,7 +24,7 @@ export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      titleData: [{ key: "" }],
+      titleData: [],
       itemData: [],
       numCols: 2,
       totalPrice: 0,
