@@ -51,7 +51,7 @@ export default class CartScreen extends Component {
       const quantity = item.quantity;
       const totalPrice = item.price * quantity;
       const orderItem = item.id;
-      const note = navigation.getParam("note", "");
+      const note = this.props.navigation.getParam("note", "");
 
       const newOrder = {
         OrderNo: this.state.orderNo,
@@ -94,7 +94,7 @@ export default class CartScreen extends Component {
     this.setState({ orderItems: this.state.orderItems });
     this.props.navigation.setParams({ orderItems: this.state.orderItems });
     // increment recursively when holding button
-    this.timer = setTimeout(this._itemPlusHandler.bind(this, id), 85);
+    //this.timer = setTimeout(this._itemPlusHandler.bind(this, id), 85);
   };
 
   // handler for removing an item
@@ -108,13 +108,13 @@ export default class CartScreen extends Component {
     this.setState({ orderItems: this.state.orderItems });
     this.props.navigation.setParams({ orderItems: this.state.orderItems });
     // increment recursively when holding button
-    this.timer = setTimeout(this._itemMinusHandler.bind(this, id), 85);
+    //this.timer = setTimeout(this._itemMinusHandler.bind(this, id), 85);
   };
 
   // increment recursively when holding button
-  _stopTimer = () => {
-    clearTimeout(this.timer);
-  };
+  // _stopTimer = () => {
+  //   clearTimeout(this.timer);
+  // };
 
   _addTotalPrice = price => {
     this.setState({ totalPrice: this.state.totalPrice + price });
@@ -171,8 +171,9 @@ export default class CartScreen extends Component {
           <Button
             icon={{ name: "remove" }}
             buttonStyle={Styles.itemMinusButton}
-            onPressIn={this._itemMinusHandler.bind(this, item.id)}
-            onPressOut={this._stopTimer}
+            onPress={this._itemMinusHandler.bind(this, item.id)}
+            //onPressIn={this._itemMinusHandler.bind(this, item.id)}
+            //onPressOut={this._stopTimer}
           />
           <View style={Styles.itemNumber}>
             <Text> {item.quantity} </Text>
@@ -180,8 +181,9 @@ export default class CartScreen extends Component {
           <Button
             icon={{ name: "add" }}
             buttonStyle={Styles.itemPlusButton}
-            onPressIn={this._itemPlusHandler.bind(this, item.id)}
-            onPressOut={this._stopTimer}
+            onPress={this._itemPlusHandler.bind(this, item.id)}
+            //onPressIn={this._itemPlusHandler.bind(this, item.id)}
+            //onPressOut={this._stopTimer}
           />
         </View>
         {/* Trash Icon (delete) */}

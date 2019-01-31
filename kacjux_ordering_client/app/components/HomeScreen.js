@@ -41,7 +41,6 @@ export default class HomeScreen extends Component {
     let titles = [];
     let datas = [];
     let section = null;
-    let title_id = 0;
     // api get
     const result = getAllItems()
       .then(res => {
@@ -60,8 +59,7 @@ export default class HomeScreen extends Component {
 
             // For side section bar
             if (titles.filter(td => td.key === data.type).length === 0) {
-              titles.push({ id: title_id, key: data.type });
-              title_id++;
+              titles.push({ id: 0, key: data.type });
             }
 
             // For SectionList
@@ -73,30 +71,38 @@ export default class HomeScreen extends Component {
             section.data.push(data);
           });
 
+          // Sort datas
+          datas = datas.sort((a, b) => {
+            if (a.title < b.title) {
+              return -1;
+            }
+            if (a.title > b.title) {
+              return 1;
+            }
+            return 0;
+          });
+
+          // Sort titles
+          titles = titles.sort((a, b) => {
+            if (a.key < b.key) {
+              return -1;
+            }
+            if (a.key > b.key) {
+              return 1;
+            }
+            return 0;
+          });
+
+          // Assign unique id for each title
+          for (let i = 0; i < titles.length; i++) {
+            const title = titles[i];
+            title["id"] = i;
+          }
+
+          // Save changes
           this.setState({
-            itemData: datas.sort((a, b) => {
-              if (a.title < b.title) {
-                return -1;
-              }
-              if (a.title > b.title) {
-                return 1;
-              }
-              return 0;
-            }),
-            titleData: titles.sort((a, b) => {
-              if (a.key < b.key) {
-                if (a.id > b.id) {
-                  const id = a.id;
-                  a.id = b.id;
-                  b.id = id;
-                }
-                return -1;
-              }
-              if (a.key > b.key) {
-                return 1;
-              }
-              return 0;
-            })
+            itemData: datas,
+            titleData: titles
           });
         } else {
           console.log("Get items failed.");
@@ -189,6 +195,7 @@ export default class HomeScreen extends Component {
 
     for (let i = index; i < index + numColumns; i++) {
       items.push(
+        // if it has uneven items, then add an empty cell
         typeof section.data[i] === "undefined" ? (
           <View
             key={`EX_SPACE${Math.floor(Math.random() * 1000)}`}
@@ -338,7 +345,7 @@ export default class HomeScreen extends Component {
               buttonStyle={Styles.cartButton}
               textStyle={Styles.cartText}
               containerViewStyle={Styles.cartContainerView}
-              onPress={() => navigate("OrderView", {})}
+              //onPress={() => navigate("OrderView", {})}
             />
           )}
         </View>
