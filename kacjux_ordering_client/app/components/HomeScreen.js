@@ -54,7 +54,8 @@ export default class HomeScreen extends Component {
               description: item.Description,
               price: parseFloat(item.Price.replace("$", "")),
               type: item.Type,
-              quantity: 0
+              quantity: 0,
+              index: 0
             };
 
             // For side section bar
@@ -65,7 +66,7 @@ export default class HomeScreen extends Component {
             // For SectionList
             section = datas.find(d => d.title === data.type);
             if (typeof section === "undefined") {
-              section = { title: data.type, data: [] };
+              section = { title: data.type, data: [], index: 0 };
               datas.push(section);
             }
             section.data.push(data);
@@ -81,6 +82,16 @@ export default class HomeScreen extends Component {
             }
             return 0;
           });
+
+          // Assign unique id for each title
+          for (let i = 0; i < datas.length; i++) {
+            const data = datas[i];
+            data["index"] = i;
+            for (let j = 0; j < data.length; j++) {
+              const item = data[j];
+              item["index"] = j;
+            }
+          }
 
           // Sort titles
           titles = titles.sort((a, b) => {

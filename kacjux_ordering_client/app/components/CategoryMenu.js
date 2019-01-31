@@ -7,12 +7,30 @@ import {
   TouchableHighlight,
   SectionList
 } from "react-native";
+//import { SearchBar } from "react-native-elements";
+import SearchableDropdown from "react-native-searchable-dropdown";
 import Styles from "../styles/StyleSheet";
 
 export class CategoryMenu extends Component {
   constructor(props) {
     super(props);
   }
+
+  _setSearchableItemList = () => {
+    let list = [];
+    this.props.itemData.forEach(section => {
+      list = list.concat(
+        section.data.map(item => {
+          return {
+            sectionId: section.index,
+            itemId: item.index,
+            name: item.key
+          };
+        })
+      );
+    });
+    return list;
+  };
 
   _onMenuScroll = event => {
     //console.log(event.nativeEvent.contentOffset.y);
@@ -69,6 +87,36 @@ export class CategoryMenu extends Component {
           </ScrollView>
         </View>
         <View style={Styles.menuContainer}>
+          <SearchableDropdown
+            onItemSelect={item =>
+              this.secListRef.scrollToLocation({
+                animated: true,
+                itemIndex: item.itemId,
+                sectionIndex: item.sectionId
+              })
+            }
+            containerStyle={{ padding: 5 }}
+            textInputStyle={{
+              padding: 12,
+              borderWidth: 1,
+              borderColor: "#ccc",
+              borderRadius: 5
+            }}
+            itemStyle={{
+              padding: 10,
+              marginTop: 2,
+              backgroundColor: "#ddd",
+              borderColor: "#bbb",
+              borderWidth: 1,
+              borderRadius: 5
+            }}
+            itemTextStyle={{ color: "#222" }}
+            itemsContainerStyle={{ maxHeight: 140 }}
+            items={this._setSearchableItemList()}
+            placeholder="Search here..."
+            resetValue={false}
+            underlineColorAndroid="transparent"
+          />
           <SectionList
             ref={ref => {
               this.secListRef = ref;
