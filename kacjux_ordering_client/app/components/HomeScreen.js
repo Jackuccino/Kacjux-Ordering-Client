@@ -38,6 +38,9 @@ export default class HomeScreen extends Component {
   }
 
   _getItems = () => {
+    const titles = [];
+    const datas = [];
+    let id = 0;
     // api get
     const result = getAllItems()
       .then(res => {
@@ -53,61 +56,43 @@ export default class HomeScreen extends Component {
               type: item.Type,
               quantity: 0
             };
-            // For FlatList
-            this.state.itemData.push(data);
-            if (
-              this.state.titleData.filter(td => td.key === data.type).length ===
-              0
-            ) {
-              this.state.titleData.push({ key: data.type });
+            datas.push(data);
+            if (titles.filter(td => td.key === data.type).length === 0) {
+              titles.push({ id: id, key: data.type });
+              id++;
             }
-
-            // For SectionList
-            // const section = this.state.itemData.find(d => d.title == data.type);
-            // if (section === null) {
-            //   section = { title: data.type, data: [] };
-            //   this.state.itemData.push(section);
-            // }
-            // section.data.push(data);
           });
 
-          // Sort side menu titles
-          for (let i = 0; i < this.state.titleData.length - 1; i++) {
-            const title = this.state.titleData[i];
-            const titleNext = this.state.titleData[i + 1];
-            if (title.key > titleNext.key) {
-              this.state.titleData = this.state.titleData.filter(
-                td => td.key != title.key
-              );
-              this.state.titleData.push({ key: title.key });
-              i = 0;
-            }
-          }
-
-          // Sort dishes
-          for (let i = 0; i < this.state.itemData.length - 1; i++) {
-            const data = this.state.itemData[i];
-            const dataNext = this.state.itemData[i + 1];
-            if (data.type > dataNext.type) {
-              this.state.itemData = this.state.itemData.filter(
-                td => td.key != data.key
-              );
-              this.state.itemData.push({
-                id: data.id,
-                key: data.key,
-                image: data.image,
-                description: data.description,
-                price: data.price,
-                type: data.type,
-                quantity: data.quantity
-              });
-              i = 0;
-            }
-          }
-
           this.setState({
-            data: this.state.itemData,
-            titleData: this.state.titleData.filter(td => td.key !== "")
+            itemData: datas.sort((a, b) => {
+              if (a.type < b.type) {
+                return -1;
+              }
+              if (a.type > b.type) {
+                return 1;
+              }
+              if (a.key < b.key) {
+                return -1;
+              }
+              if (a.key > b.key) {
+                return 1;
+              }
+              return 0;
+            }),
+            titleData: titles.sort((a, b) => {
+              if (a.key < b.key) {
+                if (a.id > b.id) {
+                  const id = a.id;
+                  a.id = b.id;
+                  b.id = id;
+                }
+                return -1;
+              }
+              if (a.key > b.key) {
+                return 1;
+              }
+              return 0;
+            })
           });
         } else {
           console.log("Get items failed.");
@@ -149,7 +134,7 @@ export default class HomeScreen extends Component {
     this._addTotalPrice(data.price);
     this.setState({ data: this.state.itemData });
     // increment recursively when holding button
-    this.timer = setTimeout(this._itemPlusHandler.bind(this, id), 85);
+    //this.timer = setTimeout(this._itemPlusHandler.bind(this, id), 85);
   };
 
   // handler for removing an item
@@ -161,14 +146,12 @@ export default class HomeScreen extends Component {
       this._minusTotalPrice(data.price);
     }
     this.setState({ data: this.state.itemData });
-    // increment recursively when holding button
-    this.timer = setTimeout(this._itemMinusHandler.bind(this, id), 85);
   };
 
   // increment recursively when holding button
-  _stopTimer = () => {
-    clearTimeout(this.timer);
-  };
+  // _stopTimer = () => {
+  //   clearTimeout(this.timer);
+  // };
 
   _addTotalPrice = price => {
     this.setState({ totalPrice: this.state.totalPrice + price });
@@ -206,18 +189,21 @@ export default class HomeScreen extends Component {
         </View>
         {/* - counter + */}
         <View style={Styles.itemCounterContainer}>
-          <Button
-            icon={{
-              name: "remove",
-              size: 15
-            }}
-            buttonStyle={Styles.itemButton}
-            onPressIn={this._itemMinusHandler.bind(this, item.id)}
-            onPressOut={this._stopTimer}
-          />
-          <View style={Styles.itemNumber}>
-            <Text> {item.quantity} </Text>
-          </View>
+          {item.quantity === 0 ? null : (
+            <Button
+              icon={{
+                name: "remove",
+                size: 15
+              }}
+              buttonStyle={[Styles.itemButton, { backgroundColor: "red" }]}
+              onPress={this._itemMinusHandler.bind(this, item.id)}
+            />
+          )}
+          {item.quantity === 0 ? null : (
+            <View style={Styles.itemNumber}>
+              <Text> {item.quantity} </Text>
+            </View>
+          )}
           <Button
             icon={{
               name: "add",
@@ -226,8 +212,9 @@ export default class HomeScreen extends Component {
             containerViewStyle={{ borderRadius: 30 }}
             borderRadius={30}
             buttonStyle={Styles.itemButton}
-            onPressIn={this._itemPlusHandler.bind(this, item.id)}
-            onPressOut={this._stopTimer}
+            onPress={this._itemPlusHandler.bind(this, item.id)}
+            //onPressIn={this._itemPlusHandler.bind(this, item.id)}
+            //onPressOut={this._stopTimer}
           />
         </View>
       </View>
@@ -310,7 +297,7 @@ export default class HomeScreen extends Component {
           <Text style={Styles.totalPrice}>
             ${this.state.totalPrice.toFixed(2)}
           </Text>
-          {this.state.status == 0 ? (
+          {this.state.status === 0 ? (
             //  Go to Cart View
             <Button
               disabled={this.state.totalItem === 0}

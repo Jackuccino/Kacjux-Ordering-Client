@@ -10,6 +10,8 @@ exports.getImage = name => {
       return require("../assets/images/potsticker.jpg");
     case "Mar Far Chicken":
       return require("../assets/images/mfch.png");
+    case "Pork Fried Rice":
+      return require("../assets/images/pfrice.jpg");
     default:
       return null;
   }

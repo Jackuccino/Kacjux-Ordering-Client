@@ -145,7 +145,7 @@ export default StyleSheet.create({
     backgroundColor: "transparent"
   },
   sideMenuBarContainer: {
-    width: 150
+    width: 120
   },
   menuContainer: {
     flex: 1

@@ -12,12 +12,20 @@ import Styles from "../styles/StyleSheet";
 export class CategoryMenu extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {};
   }
 
   // scroll to item
-  _scrollToIndex = index => {
+  _scrollToIndex = (index, id) => {
+    for (var ref in this.titleRef) {
+      this.titleRef[ref].setNativeProps({
+        style: {
+          backgroundColor: Styles.defaultBackgroundColor.backgroundColor
+        }
+      });
+    }
+    this.titleRef[id].setNativeProps({
+      style: { backgroundColor: "lightgrey" }
+    });
     this.flatListRef.scrollToIndex({ animated: true, index: index });
   };
 
@@ -27,17 +35,28 @@ export class CategoryMenu extends Component {
         underlayColor={"lightgrey"}
         onPress={this._scrollToIndex.bind(
           this,
-          Math.floor((Math.random() / Math.random()) * 3) % 2 // tempo
+          Math.floor((Math.random() / Math.random()) * 3) % 2, // tempo
+          `REF-FLATLIST${item.id}`
         )}
       >
-        <Text style={Styles.menuHeader}>{item.key}</Text>
+        <Text
+          ref={ref => {
+            this.titleRef = {
+              ...this.titleRef,
+              [`REF-FLATLIST${item.id}`]: ref
+            };
+          }}
+          style={Styles.menuHeader}
+        >
+          {item.key}
+        </Text>
       </TouchableHighlight>
     );
   };
 
   render() {
     return (
-      <View style={Styles.horizontalView}>
+      <View style={[Styles.horizontalView]}>
         <View style={Styles.sideMenuBarContainer}>
           <ScrollView>
             <FlatList
