@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, Image, Alert } from "react-native";
+import { Text, View, Image, SectionList } from "react-native";
 
 import { Button, Icon } from "react-native-elements";
 import IconBadge from "react-native-icon-badge";
@@ -26,7 +26,7 @@ export default class HomeScreen extends Component {
     this.state = {
       titleData: [],
       itemData: [],
-      numCols: 2,
+      numCols: 3,
       totalPrice: 0,
       totalItem: 0,
       tableNo: 1,
@@ -38,9 +38,11 @@ export default class HomeScreen extends Component {
   }
 
   _getItems = () => {
-    const titles = [];
-    const datas = [];
-    let id = 0;
+    let titles = [];
+    let datas = [];
+    let section = null;
+    let title_id = 0;
+    let section_id = 0;
     // api get
     const result = getAllItems()
       .then(res => {
@@ -56,25 +58,34 @@ export default class HomeScreen extends Component {
               type: item.Type,
               quantity: 0
             };
-            datas.push(data);
+
+            // For side section bar
             if (titles.filter(td => td.key === data.type).length === 0) {
-              titles.push({ id: id, key: data.type });
-              id++;
+              titles.push({ id: title_id, key: data.type });
+              title_id++;
             }
+
+            // For SectionList
+            section = datas.find(d => d.title === data.type);
+            if (typeof section === "undefined") {
+              section = { title: data.type, data: [], index: section_id };
+              datas.push(section);
+              section_id++;
+            }
+            section.data.push(data);
           });
 
           this.setState({
             itemData: datas.sort((a, b) => {
-              if (a.type < b.type) {
+              if (a.title < b.title) {
+                if (a.index > b.index) {
+                  const index = a.index;
+                  a.index = b.index;
+                  b.index = index;
+                }
                 return -1;
               }
-              if (a.type > b.type) {
-                return 1;
-              }
-              if (a.key < b.key) {
-                return -1;
-              }
-              if (a.key > b.key) {
+              if (a.title > b.title) {
                 return 1;
               }
               return 0;
@@ -108,17 +119,22 @@ export default class HomeScreen extends Component {
     var totalItem = 0;
     var totalPrice = 0;
     data.forEach(newData => {
-      const oldData = this.state.itemData.find(d => d.id === newData.id);
-      oldData.quantity = newData.quantity;
+      this.state.itemData.forEach(item => {
+        const oldData = item.data.find(d => d.id === newData.id);
+        if (typeof oldData !== "undefined") {
+          oldData.quantity = newData.quantity;
+        }
+      });
     });
 
-    this.state.itemData.forEach(newData => {
-      totalItem += newData.quantity;
-      totalPrice += newData.quantity * newData.price;
+    this.state.itemData.forEach(item => {
+      item.data.forEach(newData => {
+        totalItem += newData.quantity;
+        totalPrice += newData.quantity * newData.price;
+      });
     });
 
     this.setState({
-      data: this.state.itemData,
       totalItem: totalItem,
       totalPrice: totalPrice,
       status: status,
@@ -127,25 +143,22 @@ export default class HomeScreen extends Component {
   };
 
   // handler for adding an item
-  _itemPlusHandler = id => {
-    const data = this.state.itemData.find(d => d.id === id);
-    data.quantity++;
+  _itemPlusHandler = item => {
+    item.quantity++;
     this._addTotalItem();
-    this._addTotalPrice(data.price);
-    this.setState({ data: this.state.itemData });
+    this._addTotalPrice(item.price);
+
     // increment recursively when holding button
-    //this.timer = setTimeout(this._itemPlusHandler.bind(this, id), 85);
+    //this.timer = setTimeout(this._itemPlusHandler.bind(this, item), 100);
   };
 
   // handler for removing an item
-  _itemMinusHandler = id => {
-    const data = this.state.itemData.find(d => d.id === id);
-    if (data.quantity > 0) {
-      data.quantity--;
+  _itemMinusHandler = item => {
+    if (item.quantity > 0) {
+      item.quantity--;
       this._minusTotalItem();
-      this._minusTotalPrice(data.price);
+      this._minusTotalPrice(item.price);
     }
-    this.setState({ data: this.state.itemData });
   };
 
   // increment recursively when holding button
@@ -169,61 +182,96 @@ export default class HomeScreen extends Component {
     this.setState({ totalItem: this.state.totalItem - 1 });
   };
 
+  _renderSectionHeader = ({ section: { title } }) => {
+    return <Text style={Styles.sectionHeader}>{title}</Text>;
+  };
+
   // rendering data for item list
-  _renderItem = ({ item }) => {
-    if (item.type === "empty") {
-      return <View disabled style={[Styles.itemGrid, Styles.itemInvisible]} />;
-    }
-    return (
-      <View style={Styles.itemGrid}>
-        {/* image */}
-        <Image source={item.image} style={Styles.itemImage} />
-        <View style={Styles.itemTitlePrice}>
-          {/* title */}
-          <Text style={Styles.itemTitle}>{item.key}</Text>
-          {/* Price */}
-          <Text style={Styles.itemPrice}>${item.price.toFixed(2)}</Text>
-        </View>
-        <View style={Styles.itemTitlePrice}>
-          <Text style={Styles.itemDescription}>{item.description}</Text>
-        </View>
-        {/* - counter + */}
-        <View style={Styles.itemCounterContainer}>
-          {item.quantity === 0 ? null : (
-            <Button
-              icon={{
-                name: "remove",
-                size: 15
-              }}
-              buttonStyle={[Styles.itemButton, { backgroundColor: "red" }]}
-              onPress={this._itemMinusHandler.bind(this, item.id)}
-            />
-          )}
-          {item.quantity === 0 ? null : (
-            <View style={Styles.itemNumber}>
-              <Text> {item.quantity} </Text>
-            </View>
-          )}
-          <Button
-            icon={{
-              name: "add",
-              size: 15
-            }}
-            containerViewStyle={{ borderRadius: 30 }}
-            borderRadius={30}
-            buttonStyle={Styles.itemButton}
-            onPress={this._itemPlusHandler.bind(this, item.id)}
-            //onPressIn={this._itemPlusHandler.bind(this, item.id)}
-            //onPressOut={this._stopTimer}
+  _renderItem = ({ index, section }) => {
+    const numColumns = this.state.numCols;
+
+    if (index % numColumns !== 0) return null;
+
+    section.data = this._formatData(section.data, numColumns);
+
+    const items = [];
+
+    for (let i = index; i < index + numColumns; i++) {
+      // Checking uneven dishes
+      if (i >= section.data.length) {
+        break;
+      }
+      items.push(
+        section.data[i].type === "empty" ? (
+          <View
+            key={`KEY_DISH${section.data[i].id}`}
+            disabled
+            style={[Styles.itemGrid, Styles.itemInvisible]}
           />
-        </View>
-      </View>
-    );
+        ) : (
+          <View key={`KEY_DISH${section.data[i].id}`} style={Styles.itemGrid}>
+            {/* image */}
+            <Image source={section.data[i].image} style={Styles.itemImage} />
+            <View style={Styles.itemTitlePrice}>
+              {/* title */}
+              <Text style={Styles.itemTitle}>{section.data[i].key}</Text>
+              {/* Price */}
+              <Text style={Styles.itemPrice}>
+                ${section.data[i].price.toFixed(2)}
+              </Text>
+            </View>
+            <View style={Styles.itemTitlePrice}>
+              <Text style={Styles.itemDescription}>
+                {section.data[i].description}
+              </Text>
+            </View>
+            {/* - counter + */}
+            <View style={Styles.itemCounterContainer}>
+              {section.data[i].quantity === 0 ? null : (
+                <Button
+                  icon={{
+                    name: "remove",
+                    size: 15
+                  }}
+                  buttonStyle={[Styles.itemButton, { backgroundColor: "red" }]}
+                  onPress={this._itemMinusHandler.bind(this, section.data[i])}
+                />
+              )}
+              {section.data[i].quantity === 0 ? null : (
+                <View style={Styles.itemNumber}>
+                  <Text> {section.data[i].quantity} </Text>
+                </View>
+              )}
+              <Button
+                icon={{
+                  name: "add",
+                  size: 15
+                }}
+                containerViewStyle={{ borderRadius: 30 }}
+                borderRadius={30}
+                buttonStyle={Styles.itemButton}
+                onPress={this._itemPlusHandler.bind(this, section.data[i])}
+                //onPressIn={this._itemPlusHandler.bind(this, section.data[i])}
+                //onPressOut={this._stopTimer}
+              />
+            </View>
+          </View>
+        )
+      );
+    }
+
+    return <View style={Styles.sectionListContainer}>{items}</View>;
   };
 
   // return a list of selected items
   _getSelectedItems = () => {
-    return this.state.itemData.filter(d => d.quantity !== 0);
+    let selectedItems = [];
+    this.state.itemData.forEach(item => {
+      selectedItems = selectedItems.concat(
+        item.data.filter(d => d.quantity !== 0)
+      );
+    });
+    return selectedItems;
   };
 
   // return a string of current day+month
@@ -247,7 +295,7 @@ export default class HomeScreen extends Component {
       numberOfElementsLastRow !== 0
     ) {
       data.push({
-        id: -1,
+        id: numberOfElementsLastRow * -1,
         key: "",
         image: null,
         description: "",
@@ -269,11 +317,12 @@ export default class HomeScreen extends Component {
         {/* item list */}
         <CategoryMenu
           contentContainerStyle={Styles.itemContentContainer}
-          titleData={this.state.titleData}
-          itemData={this._formatData(this.state.itemData, this.state.numCols)}
           renderItem={this._renderItem}
-          numColumns={this.state.numCols}
+          renderSectionHeader={this._renderSectionHeader}
+          titleData={this.state.titleData}
+          itemData={this.state.itemData}
           extraData={this.state}
+          keyExtractor={(item, index) => item + index}
         />
         {/* cart button bar */}
         <View style={Styles.bottom}>

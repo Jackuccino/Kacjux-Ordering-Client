@@ -5,7 +5,7 @@ import {
   Text,
   ScrollView,
   TouchableHighlight,
-  Alert
+  SectionList
 } from "react-native";
 import Styles from "../styles/StyleSheet";
 
@@ -15,35 +15,34 @@ export class CategoryMenu extends Component {
   }
 
   // scroll to item
-  _scrollToIndex = (index, id) => {
+  _scrollToIndex = id => {
     for (var ref in this.titleRef) {
       this.titleRef[ref].setNativeProps({
-        style: {
-          backgroundColor: Styles.defaultBackgroundColor.backgroundColor
-        }
+        style: Styles.defaultBackgroundColor
       });
     }
     this.titleRef[id].setNativeProps({
       style: { backgroundColor: "lightgrey" }
     });
-    this.flatListRef.scrollToIndex({ animated: true, index: index });
+
+    this.secListRef.scrollToLocation({
+      animated: true,
+      itemIndex: 0,
+      sectionIndex: id
+    });
   };
 
   _renderSideBarMenuItem = ({ item }) => {
     return (
       <TouchableHighlight
         underlayColor={"lightgrey"}
-        onPress={this._scrollToIndex.bind(
-          this,
-          Math.floor((Math.random() / Math.random()) * 3) % 2, // tempo
-          `REF-FLATLIST${item.id}`
-        )}
+        onPress={this._scrollToIndex.bind(this, item.id)}
       >
         <Text
           ref={ref => {
             this.titleRef = {
               ...this.titleRef,
-              [`REF-FLATLIST${item.id}`]: ref
+              [item.id]: ref
             };
           }}
           style={Styles.menuHeader}
@@ -66,15 +65,17 @@ export class CategoryMenu extends Component {
           </ScrollView>
         </View>
         <View style={Styles.menuContainer}>
-          <FlatList
+          <SectionList
             ref={ref => {
-              this.flatListRef = ref;
+              this.secListRef = ref;
             }}
             contentContainerStyle={this.props.contentContainerStyle}
-            data={this.props.itemData}
+            sections={this.props.itemData}
             renderItem={this.props.renderItem}
-            numColumns={this.props.numColumns}
+            renderSectionHeader={this.props.renderSectionHeader}
+            //numColumns={this.props.numColumns}
             extraData={this.props.extraData}
+            keyExtractor={this.props.keyExtractor}
           />
         </View>
       </View>

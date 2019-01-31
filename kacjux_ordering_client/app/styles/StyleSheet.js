@@ -160,5 +160,14 @@ export default StyleSheet.create({
   },
   defaultBackgroundColor: {
     backgroundColor: "#f5fcff"
+  },
+  sectionListContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between"
+  },
+  sectionHeader: {
+    flex: 1,
+    fontSize: 25,
+    fontWeight: "bold"
   }
 });
