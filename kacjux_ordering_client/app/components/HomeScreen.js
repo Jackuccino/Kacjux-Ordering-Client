@@ -249,9 +249,6 @@ export default class HomeScreen extends Component {
         )
       );
     }
-
-    console.log(items);
-
     return <View style={Styles.sectionListContainer}>{items}</View>;
   };
 
