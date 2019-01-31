@@ -12,6 +12,8 @@ exports.getImage = name => {
       return require("../assets/images/mfch.png");
     case "Pork Fried Rice":
       return require("../assets/images/pfrice.jpg");
+    case "Pork Foo Young":
+      return require("../assets/images/porkefy.jpg");
     default:
       return null;
   }

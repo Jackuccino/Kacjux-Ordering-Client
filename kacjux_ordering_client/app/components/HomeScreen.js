@@ -42,7 +42,6 @@ export default class HomeScreen extends Component {
     let datas = [];
     let section = null;
     let title_id = 0;
-    let section_id = 0;
     // api get
     const result = getAllItems()
       .then(res => {
@@ -68,9 +67,8 @@ export default class HomeScreen extends Component {
             // For SectionList
             section = datas.find(d => d.title === data.type);
             if (typeof section === "undefined") {
-              section = { title: data.type, data: [], index: section_id };
+              section = { title: data.type, data: [] };
               datas.push(section);
-              section_id++;
             }
             section.data.push(data);
           });
@@ -78,11 +76,6 @@ export default class HomeScreen extends Component {
           this.setState({
             itemData: datas.sort((a, b) => {
               if (a.title < b.title) {
-                if (a.index > b.index) {
-                  const index = a.index;
-                  a.index = b.index;
-                  b.index = index;
-                }
                 return -1;
               }
               if (a.title > b.title) {
@@ -192,19 +185,13 @@ export default class HomeScreen extends Component {
 
     if (index % numColumns !== 0) return null;
 
-    section.data = this._formatData(section.data, numColumns);
-
     const items = [];
 
     for (let i = index; i < index + numColumns; i++) {
-      // Checking uneven dishes
-      if (i >= section.data.length) {
-        break;
-      }
       items.push(
-        section.data[i].type === "empty" ? (
+        typeof section.data[i] === "undefined" ? (
           <View
-            key={`KEY_DISH${section.data[i].id}`}
+            key={`EX_SPACE${Math.floor(Math.random() * 1000)}`}
             disabled
             style={[Styles.itemGrid, Styles.itemInvisible]}
           />
@@ -233,7 +220,10 @@ export default class HomeScreen extends Component {
                     name: "remove",
                     size: 15
                   }}
-                  buttonStyle={[Styles.itemButton, { backgroundColor: "red" }]}
+                  buttonStyle={[
+                    Styles.itemMinusButton,
+                    { backgroundColor: "red" }
+                  ]}
                   onPress={this._itemMinusHandler.bind(this, section.data[i])}
                 />
               )}
@@ -249,7 +239,7 @@ export default class HomeScreen extends Component {
                 }}
                 containerViewStyle={{ borderRadius: 30 }}
                 borderRadius={30}
-                buttonStyle={Styles.itemButton}
+                buttonStyle={Styles.itemPlusButton}
                 onPress={this._itemPlusHandler.bind(this, section.data[i])}
                 //onPressIn={this._itemPlusHandler.bind(this, section.data[i])}
                 //onPressOut={this._stopTimer}
@@ -259,6 +249,8 @@ export default class HomeScreen extends Component {
         )
       );
     }
+
+    console.log(items);
 
     return <View style={Styles.sectionListContainer}>{items}</View>;
   };
@@ -283,30 +275,6 @@ export default class HomeScreen extends Component {
       date.getHours().toString() +
       date.getMinutes().toString()
     );
-  };
-
-  // Add empty object to the last row if uneven
-  _formatData = (data, numColumns) => {
-    const numberOfFullRows = Math.floor(data.length / numColumns);
-
-    let numberOfElementsLastRow = data.length - numberOfFullRows * numColumns;
-    while (
-      numberOfElementsLastRow !== numColumns &&
-      numberOfElementsLastRow !== 0
-    ) {
-      data.push({
-        id: numberOfElementsLastRow * -1,
-        key: "",
-        image: null,
-        description: "",
-        price: 0,
-        type: "empty",
-        quantity: 0
-      });
-      numberOfElementsLastRow++;
-    }
-
-    return data;
   };
 
   // Main()

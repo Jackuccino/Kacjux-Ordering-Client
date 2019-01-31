@@ -170,7 +170,7 @@ export default class CartScreen extends Component {
         <View style={Styles.itemCounterContainer}>
           <Button
             icon={{ name: "remove" }}
-            buttonStyle={Styles.itemButton}
+            buttonStyle={Styles.itemMinusButton}
             onPressIn={this._itemMinusHandler.bind(this, item.id)}
             onPressOut={this._stopTimer}
           />
@@ -179,7 +179,7 @@ export default class CartScreen extends Component {
           </View>
           <Button
             icon={{ name: "add" }}
-            buttonStyle={Styles.itemButton}
+            buttonStyle={Styles.itemPlusButton}
             onPressIn={this._itemPlusHandler.bind(this, item.id)}
             onPressOut={this._stopTimer}
           />

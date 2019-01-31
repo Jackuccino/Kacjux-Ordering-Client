@@ -14,8 +14,12 @@ export class CategoryMenu extends Component {
     super(props);
   }
 
+  _onMenuScroll = event => {
+    //console.log(event.nativeEvent.contentOffset.y);
+  };
+
   // scroll to item
-  _scrollToIndex = id => {
+  _scrollToSection = id => {
     for (var ref in this.titleRef) {
       this.titleRef[ref].setNativeProps({
         style: Styles.defaultBackgroundColor
@@ -36,7 +40,7 @@ export class CategoryMenu extends Component {
     return (
       <TouchableHighlight
         underlayColor={"lightgrey"}
-        onPress={this._scrollToIndex.bind(this, item.id)}
+        onPress={this._scrollToSection.bind(this, item.id)}
       >
         <Text
           ref={ref => {
@@ -73,9 +77,9 @@ export class CategoryMenu extends Component {
             sections={this.props.itemData}
             renderItem={this.props.renderItem}
             renderSectionHeader={this.props.renderSectionHeader}
-            //numColumns={this.props.numColumns}
             extraData={this.props.extraData}
             keyExtractor={this.props.keyExtractor}
+            onScroll={this._onMenuScroll}
           />
         </View>
       </View>

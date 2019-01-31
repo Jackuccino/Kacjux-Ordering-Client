@@ -87,7 +87,16 @@ export default StyleSheet.create({
     height: 40,
     width: 60
   },
-  itemButton: {
+  itemMinusButton: {
+    width: "auto",
+    borderRadius: 30,
+    width: 40,
+    height: 40,
+    padding: 0,
+    paddingLeft: 10,
+    backgroundColor: "red"
+  },
+  itemPlusButton: {
     width: "auto",
     borderRadius: 30,
     width: 40,
@@ -166,8 +175,8 @@ export default StyleSheet.create({
     justifyContent: "space-between"
   },
   sectionHeader: {
-    flex: 1,
     fontSize: 25,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    margin: 5
   }
 });
