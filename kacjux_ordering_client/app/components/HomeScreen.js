@@ -6,7 +6,7 @@ import IconBadge from "react-native-icon-badge";
 
 import Styles from "../styles/StyleSheet";
 import { getAllItems } from "../services/Server";
-import { getImage } from "../helper/ImageHelper";
+import { getImage } from "../helpers/ImageHelper";
 import CategoryMenu from "./CategoryMenu";
 
 export default class HomeScreen extends Component {
@@ -26,7 +26,7 @@ export default class HomeScreen extends Component {
     this.state = {
       titleData: [],
       itemData: [],
-      numCols: 3,
+      numCols: 2,
       totalPrice: 0,
       totalItem: 0,
       tableNo: 1,
@@ -87,8 +87,8 @@ export default class HomeScreen extends Component {
           for (let i = 0; i < datas.length; i++) {
             const data = datas[i];
             data["index"] = i;
-            for (let j = 0; j < data.length; j++) {
-              const item = data[j];
+            for (let j = 0; j < data.data.length; j++) {
+              const item = data.data[j];
               item["index"] = j;
             }
           }
@@ -304,6 +304,7 @@ export default class HomeScreen extends Component {
           renderSectionHeader={this._renderSectionHeader}
           titleData={this.state.titleData}
           itemData={this.state.itemData}
+          numColumns={this.state.numCols}
           extraData={this.state}
           keyExtractor={(item, index) => item + index}
         />

@@ -178,5 +178,28 @@ export default StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold",
     margin: 5
+  },
+  searchBarTextInput: {
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5
+  },
+  searchBarItem: {
+    padding: 10,
+    marginTop: 2,
+    backgroundColor: "#ddd",
+    borderColor: "#bbb",
+    borderWidth: 1,
+    borderRadius: 5
+  },
+  searchBarItemText: {
+    color: "#222"
+  },
+  searchBarItemContainer: {
+    maxHeight: 140
+  },
+  searchBarContainer: {
+    padding: 5
   }
 });

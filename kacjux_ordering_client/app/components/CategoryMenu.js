@@ -7,16 +7,36 @@ import {
   TouchableHighlight,
   SectionList
 } from "react-native";
-//import { SearchBar } from "react-native-elements";
 import SearchableDropdown from "react-native-searchable-dropdown";
 import Styles from "../styles/StyleSheet";
 
 export class CategoryMenu extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      sectionYs: [],
+      numberOfections: 0,
+      yForEachItem: 471,
+      enableScroll: true,
+      initState: true
+    };
   }
 
-  _setSearchableItemList = () => {
+  _getSectionYs = () => {
+    const list = [];
+    let counter = 0;
+    this.props.itemData.forEach(section => {
+      counter++;
+      list.push(Math.ceil(section.data.length / this.props.numColumns));
+    });
+    this.setState({
+      sectionYs: list,
+      numberOfections: counter
+    });
+  };
+
+  _getSearchableItemList = () => {
     let list = [];
     this.props.itemData.forEach(section => {
       list = list.concat(
@@ -32,17 +52,78 @@ export class CategoryMenu extends Component {
     return list;
   };
 
-  _onMenuScroll = event => {
-    //console.log(event.nativeEvent.contentOffset.y);
-  };
-
-  // scroll to item
-  _scrollToSection = id => {
+  _resetHighlight = () => {
     for (var ref in this.titleRef) {
       this.titleRef[ref].setNativeProps({
         style: Styles.defaultBackgroundColor
       });
     }
+  };
+
+  _onMenuScroll = event => {
+    // For scroll to highlight side menu header
+    if (this.state.sectionYs.length === 0) {
+      this._getSectionYs();
+    }
+
+    if (this.state.enableScroll === true) {
+      // If A is been highlighted, dont reset
+      if (!this.state.initState) {
+        this._resetHighlight();
+      } else {
+        this.setState({ initState: false });
+      }
+
+      // Scroll and highlight side header
+      if (
+        event.nativeEvent.contentOffset.y <
+        this.state.yForEachItem * this.state.sectionYs[0]
+      ) {
+        this.titleRef[0].setNativeProps({
+          style: { backgroundColor: "lightgrey" }
+        });
+      } else if (
+        event.nativeEvent.contentOffset.y <
+        this.state.yForEachItem * this.state.sectionYs[0] +
+          this.state.yForEachItem * this.state.sectionYs[1]
+      ) {
+        this.titleRef[1].setNativeProps({
+          style: { backgroundColor: "lightgrey" }
+        });
+      } else if (
+        event.nativeEvent.contentOffset.y <
+        this.state.yForEachItem * this.state.sectionYs[0] +
+          this.state.yForEachItem * this.state.sectionYs[1] +
+          this.state.yForEachItem * this.state.sectionYs[2]
+      ) {
+        this.titleRef[2].setNativeProps({
+          style: { backgroundColor: "lightgrey" }
+        });
+      } else if (
+        event.nativeEvent.contentOffset.y <
+        this.state.yForEachItem * this.state.sectionYs[0] +
+          this.state.yForEachItem * this.state.sectionYs[1] +
+          this.state.yForEachItem * this.state.sectionYs[2] +
+          this.state.yForEachItem * this.state.sectionYs[3]
+      ) {
+        this.titleRef[3].setNativeProps({
+          style: { backgroundColor: "lightgrey" }
+        });
+      }
+    }
+  };
+
+  // avoid highlighting when tabbing side menu
+  _enableScroll = () => {
+    this.setState({ enableScroll: true });
+  };
+
+  // scroll to item
+  _scrollToSection = id => {
+    // avoid highlighting when tabbing side menu
+    this.setState({ enableScroll: false });
+
+    this._resetHighlight();
     this.titleRef[id].setNativeProps({
       style: { backgroundColor: "lightgrey" }
     });
@@ -67,7 +148,15 @@ export class CategoryMenu extends Component {
               [item.id]: ref
             };
           }}
-          style={Styles.menuHeader}
+          style={[
+            Styles.menuHeader,
+            {
+              backgroundColor:
+                item.id === 0
+                  ? "lightgrey"
+                  : Styles.defaultBackgroundColor.defaultBackgroundColor
+            }
+          ]}
         >
           {item.key}
         </Text>
@@ -91,28 +180,16 @@ export class CategoryMenu extends Component {
             onItemSelect={item =>
               this.secListRef.scrollToLocation({
                 animated: true,
-                itemIndex: item.itemId,
+                itemIndex: item.itemId / this.props.numColumns,
                 sectionIndex: item.sectionId
               })
             }
-            containerStyle={{ padding: 5 }}
-            textInputStyle={{
-              padding: 12,
-              borderWidth: 1,
-              borderColor: "#ccc",
-              borderRadius: 5
-            }}
-            itemStyle={{
-              padding: 10,
-              marginTop: 2,
-              backgroundColor: "#ddd",
-              borderColor: "#bbb",
-              borderWidth: 1,
-              borderRadius: 5
-            }}
-            itemTextStyle={{ color: "#222" }}
-            itemsContainerStyle={{ maxHeight: 140 }}
-            items={this._setSearchableItemList()}
+            containerStyle={Styles.searchBarContainer}
+            textInputStyle={Styles.searchBarTextInput}
+            itemStyle={Styles.searchBarItem}
+            itemTextStyle={Styles.searchBarItemText}
+            itemsContainerStyle={Styles.searchBarItemContainer}
+            items={this._getSearchableItemList()}
             placeholder="Search here..."
             resetValue={false}
             underlineColorAndroid="transparent"
@@ -128,6 +205,7 @@ export class CategoryMenu extends Component {
             extraData={this.props.extraData}
             keyExtractor={this.props.keyExtractor}
             onScroll={this._onMenuScroll}
+            onScrollEndDrag={this._enableScroll}
           />
         </View>
       </View>
