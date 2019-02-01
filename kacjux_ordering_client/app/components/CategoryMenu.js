@@ -75,46 +75,35 @@ export class CategoryMenu extends Component {
       }
 
       // Scroll and highlight side header
-      if (
-        event.nativeEvent.contentOffset.y <
+      this._highlightOnScroll(
+        event.nativeEvent.contentOffset.y,
+        0,
         this.state.yForEachItem * this.state.sectionYs[0]
-      ) {
-        this.titleRef[0].setNativeProps({
-          style: { backgroundColor: "lightgrey" }
-        });
-      } else if (
-        event.nativeEvent.contentOffset.y <
-        this.state.yForEachItem * this.state.sectionYs[0] +
-          this.state.yForEachItem * this.state.sectionYs[1]
-      ) {
-        this.titleRef[1].setNativeProps({
-          style: { backgroundColor: "lightgrey" }
-        });
-      } else if (
-        event.nativeEvent.contentOffset.y <
-        this.state.yForEachItem * this.state.sectionYs[0] +
-          this.state.yForEachItem * this.state.sectionYs[1] +
-          this.state.yForEachItem * this.state.sectionYs[2]
-      ) {
-        this.titleRef[2].setNativeProps({
-          style: { backgroundColor: "lightgrey" }
-        });
-      } else if (
-        event.nativeEvent.contentOffset.y <
-        this.state.yForEachItem * this.state.sectionYs[0] +
-          this.state.yForEachItem * this.state.sectionYs[1] +
-          this.state.yForEachItem * this.state.sectionYs[2] +
-          this.state.yForEachItem * this.state.sectionYs[3]
-      ) {
-        this.titleRef[3].setNativeProps({
-          style: { backgroundColor: "lightgrey" }
-        });
-      }
+      );
     }
   };
 
+  _highlightOnScroll = (y, index, upperBound) => {
+    if (y < upperBound) {
+      this.titleRef[index].setNativeProps({
+        style: { backgroundColor: "lightgrey" }
+      });
+      return;
+    }
+
+    if (index < this.state.sectionYs.length) {
+      this._highlightOnScroll(
+        y,
+        index + 1,
+        upperBound + this.state.yForEachItem * this.state.sectionYs[index + 1]
+      );
+    }
+
+    return;
+  };
+
   // avoid highlighting when tabbing side menu
-  _enableScroll = () => {
+  _onEndScroll = event => {
     this.setState({ enableScroll: true });
   };
 
@@ -205,7 +194,7 @@ export class CategoryMenu extends Component {
             extraData={this.props.extraData}
             keyExtractor={this.props.keyExtractor}
             onScroll={this._onMenuScroll}
-            onScrollEndDrag={this._enableScroll}
+            onScrollEndDrag={this._onEndScroll}
           />
         </View>
       </View>
