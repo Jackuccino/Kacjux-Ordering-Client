@@ -23,7 +23,8 @@ export default class CartScreen extends Component {
         onPress={() => {
           navigation.goBack();
           navigation.state.params.onBack(
-            navigation.getParam("orderItems", null),
+            navigation.getParam("totalItem", 0),
+            navigation.getParam("totalPrice", 0),
             0,
             navigation.getParam("note", "")
           );
@@ -37,30 +38,35 @@ export default class CartScreen extends Component {
     const { navigation } = this.props;
     this.state = {
       orderItems: navigation.getParam("orderItems", null),
-      orderNo: navigation.getParam("orderNo", null),
-      totalItem: navigation.getParam("totalItem", 0),
-      totalPrice: navigation.getParam("totalPrice", 0)
+      orderNo: navigation.getParam("orderNo", null)
     };
   }
 
   // Save order to database
   _submitOrdersHandler = () => {
+    const { navigation } = this.props;
+
     // Send request
     this.state.orderItems.forEach(item => {
       // Send each new order to the database
       const quantity = item.quantity;
+      item.quantity = 0;
       const totalPrice = item.price * quantity;
       const orderItem = item.id;
-      const note = this.props.navigation.getParam("note", "");
+      const note = navigation.getParam("note", "");
+      const tableNum = navigation.getParam("tableNum", 1);
 
+      // Create an Order object
       const newOrder = {
         OrderNo: this.state.orderNo,
         TotalPrice: `$${totalPrice}`,
         OrderItem: orderItem,
         Quantity: quantity,
-        Note: note
+        Note: note,
+        TableNum: tableNum
       };
 
+      // Call api and save to database
       postNewOrder(newOrder)
         .then(res => {
           if (res.result === "ok") {
@@ -75,14 +81,9 @@ export default class CartScreen extends Component {
         });
     });
 
-    const { navigation } = this.props;
     navigation.goBack();
     // 1 means order submitted
-    navigation.state.params.onBack(
-      navigation.getParam("orderItems", null),
-      1,
-      ""
-    );
+    navigation.state.params.onBack(0, 0, 1, "");
   };
 
   // handler for adding an item
@@ -91,22 +92,30 @@ export default class CartScreen extends Component {
     data.quantity++;
     this._addTotalItem();
     this._addTotalPrice(data.price);
-    this.setState({ orderItems: this.state.orderItems });
-    this.props.navigation.setParams({ orderItems: this.state.orderItems });
+    // Tell counter to update the orderItem
+    this.setState({ orderItem: this.state.orderItems });
+
     // increment recursively when holding button
     //this.timer = setTimeout(this._itemPlusHandler.bind(this, id), 85);
   };
 
   // handler for removing an item
   _itemMinusHandler = id => {
+    const { navigation } = this.props;
+    if (navigation.getParam("totalItem", 0) === 1) {
+      navigation.goBack();
+      navigation.state.params.onBack(0, 0, 0, navigation.getParam("note", ""));
+    }
+
     const data = this.state.orderItems.find(d => d.id === id);
     if (data.quantity > 0) {
       data.quantity--;
       this._minusTotalItem();
       this._minusTotalPrice(data.price);
     }
-    this.setState({ orderItems: this.state.orderItems });
-    this.props.navigation.setParams({ orderItems: this.state.orderItems });
+    // Tell counter to update the orderItem
+    this.setState({ orderItem: this.state.orderItems });
+
     // increment recursively when holding button
     //this.timer = setTimeout(this._itemMinusHandler.bind(this, id), 85);
   };
@@ -117,37 +126,59 @@ export default class CartScreen extends Component {
   // };
 
   _addTotalPrice = price => {
-    this.setState({ totalPrice: this.state.totalPrice + price });
+    const { navigation } = this.props;
+    navigation.setParams({
+      totalPrice: navigation.getParam("totalPrice", 0) + price
+    });
   };
 
   _minusTotalPrice = price => {
-    this.setState({ totalPrice: this.state.totalPrice - price });
+    const { navigation } = this.props;
+    navigation.setParams({
+      totalPrice: navigation.getParam("totalPrice", 0) - price
+    });
   };
 
   _addTotalItem = () => {
-    this.setState({ totalItem: this.state.totalItem + 1 });
+    const { navigation } = this.props;
+    navigation.setParams({
+      totalItem: navigation.getParam("totalItem", 0) + 1
+    });
   };
 
   _minusTotalItem = () => {
-    this.setState({ totalItem: this.state.totalItem - 1 });
+    const { navigation } = this.props;
+    navigation.setParams({
+      totalItem: navigation.getParam("totalItem", 0) - 1
+    });
   };
 
   // delete items in cart
   _deleteItem = id => {
-    const item = this.state.orderItems.find(i => i.id == id);
-    if (this.state.totalItem > 0) {
-      this.state.totalItem -= item.quantity;
+    const { navigation } = this.props;
+    if (navigation.getParam("totalItem", 0) === 1) {
+      navigation.goBack();
+      navigation.state.params.onBack(0, 0, 0, navigation.getParam("note", ""));
     }
-    if (this.state.totalPrice > 0) {
-      this.state.totalPrice -= (item.quantity * item.price).toFixed(2);
+
+    const item = this.state.orderItems.find(i => i.id == id);
+    const totalItem = navigation.getParam("totalItem", 0);
+    const totalPrice = navigation.getParam("totalPrice", 0);
+
+    if (totalItem > 0) {
+      navigation.setParams({
+        totalItem: totalItem - item.quantity
+      });
+    }
+    if (totalPrice > 0) {
+      navigation.setParams({
+        totalPrice: totalPrice - (item.quantity * item.price).toFixed(2)
+      });
     }
     item.quantity = 0;
-    this.setState({
-      orderItems: this.state.orderItems,
-      totalItem: this.state.totalItem,
-      totalPrice: this.state.totalPrice
-    });
-    this.props.navigation.setParams({ orderItems: this.state.orderItems });
+
+    // Tell counter to update the orderItem
+    this.setState({ orderItem: this.state.orderItems });
   };
 
   // rendering data for item list
@@ -157,7 +188,7 @@ export default class CartScreen extends Component {
         {/* image */}
         <Image
           borderRadius={50}
-          source={item.image}
+          source={{ uri: item.image }}
           style={Styles.cartItemImage}
         />
         {/* item title */}
@@ -170,6 +201,8 @@ export default class CartScreen extends Component {
         <View style={Styles.itemCounterContainer}>
           <Button
             icon={{ name: "remove" }}
+            containerViewStyle={{ borderRadius: 30 }}
+            borderRadius={30}
             buttonStyle={Styles.itemMinusButton}
             onPress={this._itemMinusHandler.bind(this, item.id)}
             //onPressIn={this._itemMinusHandler.bind(this, item.id)}
@@ -180,6 +213,8 @@ export default class CartScreen extends Component {
           </View>
           <Button
             icon={{ name: "add" }}
+            containerViewStyle={{ borderRadius: 30 }}
+            borderRadius={30}
             buttonStyle={Styles.itemPlusButton}
             onPress={this._itemPlusHandler.bind(this, item.id)}
             //onPressIn={this._itemPlusHandler.bind(this, item.id)}
@@ -206,7 +241,6 @@ export default class CartScreen extends Component {
           {/* cart item list */}
           <View>
             <FlatList
-              contentContainerStyle={Styles.itemContentContainer}
               data={this.state.orderItems}
               renderItem={this._renderItem}
               extraData={this.state}
@@ -243,17 +277,17 @@ export default class CartScreen extends Component {
               />
             }
             BadgeElement={
-              <Text style={Styles.iconBadgeText}>{this.state.totalItem}</Text>
+              <Text style={Styles.iconBadgeText}>
+                {navigation.getParam("totalItem", 0)}
+              </Text>
             }
             IconBadgeStyle={Styles.iconBadge}
-            Hidden={this.state.totalItem === 0}
             extraData={this.state}
           />
           <Text style={Styles.totalPrice}>
-            ${this.state.totalPrice.toFixed(2)}
+            ${navigation.getParam("totalPrice", 0).toFixed(2)}
           </Text>
           <Button
-            disabled={this.state.totalItem === 0}
             title="Submit"
             buttonStyle={Styles.submitButton}
             textStyle={Styles.cartText}

@@ -1,3 +1,10 @@
+/*************************************************************
+ * Home Page
+ *
+ * Author:		JinJie Xu
+ * Date Created:	2/1/2019
+ **************************************************************/
+
 import React, { Component } from "react";
 import { Text, View, Image, SectionList } from "react-native";
 
@@ -10,6 +17,7 @@ import { getImage } from "../helpers/ImageHelper";
 import CategoryMenu from "./CategoryMenu";
 
 export default class HomeScreen extends Component {
+  // Render the header of the navigation bar
   static navigationOptions = {
     headerTitle: <Text style={Styles.title}>Table# 1</Text>,
     headerRight: (
@@ -21,27 +29,55 @@ export default class HomeScreen extends Component {
     )
   };
 
+  /************************************************************
+   * Purpose:
+   *    Initial states
+   * Params:
+   *    Properties that get passed to this component
+   * Returns:
+   *    N/A
+   *************************************************************/
   constructor(props) {
     super(props);
     this.state = {
+      // Holds all the types of the menu items
       titleData: [],
+      // Holds all the menu items from the database
       itemData: [],
+      // Number of columns in the menu
       numCols: 2,
+      // Total price of all selected items
       totalPrice: 0,
+      // Total number of selected items
       totalItem: 0,
+      // Table number
       tableNo: 1,
+      // Determine if an order has submitted
       status: 0,
+      // Note that entered in cart view
       note: ""
     };
-    this.timer = null;
+    // For press and hold to add items to order
+    // this.timer = null;
+
+    // Get all items from the database
     this._getItems();
   }
 
+  /************************************************************
+   * Purpose:
+   *    Get all items from the database
+   * Params:
+   *    N/A
+   * Returns:
+   *    N/A
+   *************************************************************/
   _getItems = () => {
-    let titles = [];
-    let datas = [];
-    let section = null;
-    // api get
+    let titles = []; // holds the types of each item
+    let datas = []; // holds all the items fetched from the database
+    let section = null; // holds a section in the sectionlist
+
+    // Using Promise to fetch items from the database
     const result = getAllItems()
       .then(res => {
         if (res.result === "ok") {
@@ -50,7 +86,7 @@ export default class HomeScreen extends Component {
             const data = {
               id: item.ItemId,
               key: item.Key,
-              image: getImage(item.Key),
+              image: item.Image,
               description: item.Description,
               price: parseFloat(item.Price.replace("$", "")),
               type: item.Type,
@@ -58,21 +94,25 @@ export default class HomeScreen extends Component {
               index: 0
             };
 
-            // For side section bar
+            // Gather data for side header bar
             if (titles.filter(td => td.key === data.type).length === 0) {
+              // Header object has unique id and name
               titles.push({ id: 0, key: data.type });
             }
 
-            // For SectionList
+            // Find the section that the new item should be in
             section = datas.find(d => d.title === data.type);
+            // If the section doesn't exist, create a new one
             if (typeof section === "undefined") {
+              // Section databset have title and data fields
               section = { title: data.type, data: [], index: 0 };
               datas.push(section);
             }
+            // Push to the item to the section
             section.data.push(data);
           });
 
-          // Sort datas
+          // Sort the items in the SectionList
           datas = datas.sort((a, b) => {
             if (a.title < b.title) {
               return -1;
@@ -83,7 +123,7 @@ export default class HomeScreen extends Component {
             return 0;
           });
 
-          // Assign unique id for each title
+          // Assign an index to each item in each section
           for (let i = 0; i < datas.length; i++) {
             const data = datas[i];
             data["index"] = i;
@@ -93,7 +133,7 @@ export default class HomeScreen extends Component {
             }
           }
 
-          // Sort titles
+          // Sort headers
           titles = titles.sort((a, b) => {
             if (a.key < b.key) {
               return -1;
@@ -104,46 +144,38 @@ export default class HomeScreen extends Component {
             return 0;
           });
 
-          // Assign unique id for each title
+          // Assign unique id for each header
           for (let i = 0; i < titles.length; i++) {
             const title = titles[i];
             title["id"] = i;
           }
 
-          // Save changes
+          // Save changes to state
           this.setState({
             itemData: datas,
             titleData: titles
           });
         } else {
+          // Failed to fetch data from database
           console.log("Get items failed.");
         }
       })
       .catch(err => {
+        // Failed to call the api
         console.log(err);
       });
   };
 
-  // Update quantity and total prices after changing those in the cart
-  _updateData = (data, status, note) => {
-    var totalItem = 0;
-    var totalPrice = 0;
-    data.forEach(newData => {
-      this.state.itemData.forEach(item => {
-        const oldData = item.data.find(d => d.id === newData.id);
-        if (typeof oldData !== "undefined") {
-          oldData.quantity = newData.quantity;
-        }
-      });
-    });
-
-    this.state.itemData.forEach(item => {
-      item.data.forEach(newData => {
-        totalItem += newData.quantity;
-        totalPrice += newData.quantity * newData.price;
-      });
-    });
-
+  /************************************************************
+   * Purpose:
+   *    Update quantity and total prices after returning from the cart
+   * Params:
+   *    data: selected data
+   *    status: determine if the order has been submitted
+   * Returns:
+   *
+   *************************************************************/
+  _updateData = (totalItem, totalPrice, status, note) => {
     this.setState({
       totalItem: totalItem,
       totalPrice: totalPrice,
@@ -216,7 +248,10 @@ export default class HomeScreen extends Component {
         ) : (
           <View key={`KEY_DISH${section.data[i].id}`} style={Styles.itemGrid}>
             {/* image */}
-            <Image source={section.data[i].image} style={Styles.itemImage} />
+            <Image
+              source={{ uri: section.data[i].image }}
+              style={Styles.itemImage}
+            />
             <View style={Styles.itemTitlePrice}>
               {/* title */}
               <Text style={Styles.itemTitle}>{section.data[i].key}</Text>
@@ -238,6 +273,8 @@ export default class HomeScreen extends Component {
                     name: "remove",
                     size: 15
                   }}
+                  containerViewStyle={{ borderRadius: 30 }}
+                  borderRadius={30}
                   buttonStyle={[
                     Styles.itemMinusButton,
                     { backgroundColor: "red" }
@@ -345,6 +382,7 @@ export default class HomeScreen extends Component {
                   totalItem: this.state.totalItem,
                   totalPrice: this.state.totalPrice,
                   note: this.state.note,
+                  tableNum: this.state.tableNo,
                   onBack: this._updateData
                 })
               }
