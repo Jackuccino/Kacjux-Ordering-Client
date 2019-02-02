@@ -13,7 +13,6 @@ import IconBadge from "react-native-icon-badge";
 
 import Styles from "../styles/StyleSheet";
 import { getAllItems } from "../services/Server";
-import { getImage } from "../helpers/ImageHelper";
 import CategoryMenu from "./CategoryMenu";
 
 export default class HomeScreen extends Component {
@@ -173,7 +172,7 @@ export default class HomeScreen extends Component {
    *    data: selected data
    *    status: determine if the order has been submitted
    * Returns:
-   *
+   *    N/A
    *************************************************************/
   _updateData = (totalItem, totalPrice, status, note) => {
     this.setState({
@@ -184,17 +183,31 @@ export default class HomeScreen extends Component {
     });
   };
 
-  // handler for adding an item
+  /************************************************************
+   * Purpose:
+   *    Add the quantity of the item and update total item and price
+   * Params:
+   *    item: the item that is pressed
+   * Returns:
+   *    N/A
+   *************************************************************/
   _itemPlusHandler = item => {
     item.quantity++;
     this._addTotalItem();
     this._addTotalPrice(item.price);
 
-    // increment recursively when holding button
+    // increment continuously when holding button
     //this.timer = setTimeout(this._itemPlusHandler.bind(this, item), 100);
   };
 
-  // handler for removing an item
+  /************************************************************
+   * Purpose:
+   *    Minus the quantity of the item and update total item and price
+   * Params:
+   *    item: the item that is pressed
+   * Returns:
+   *    N/A
+   *************************************************************/
   _itemMinusHandler = item => {
     if (item.quantity > 0) {
       item.quantity--;
@@ -203,39 +216,101 @@ export default class HomeScreen extends Component {
     }
   };
 
-  // increment recursively when holding button
+  /************************************************************
+   * Purpose:
+   *    Stop the timer used for incrementing continuously when holding button
+   * Params:
+   *    N/A
+   * Returns:
+   *    N/A
+   *************************************************************/
   // _stopTimer = () => {
   //   clearTimeout(this.timer);
   // };
 
+  /************************************************************
+   * Purpose:
+   *    Add to total price in the state
+   * Params:
+   *    price: the price that needs to be added to total price
+   * Returns:
+   *    N/A
+   *************************************************************/
   _addTotalPrice = price => {
     this.setState({ totalPrice: this.state.totalPrice + price });
   };
 
+  /************************************************************
+   * Purpose:
+   *    Subtract from total price in the state
+   * Params:
+   *    price: the price that needs to be subtracted from total price
+   * Returns:
+   *    N/A
+   *************************************************************/
   _minusTotalPrice = price => {
     this.setState({ totalPrice: this.state.totalPrice - price });
   };
 
+  /************************************************************
+   * Purpose:
+   *    Add 1 to total item in the state
+   * Params:
+   *    N/A
+   * Returns:
+   *    N/A
+   *************************************************************/
   _addTotalItem = () => {
     this.setState({ totalItem: this.state.totalItem + 1 });
   };
 
+  /************************************************************
+   * Purpose:
+   *    Subtract 1 from total item in the state
+   * Params:
+   *    N/A
+   * Returns:
+   *    N/A
+   *************************************************************/
   _minusTotalItem = () => {
     this.setState({ totalItem: this.state.totalItem - 1 });
   };
 
+  /************************************************************
+   * Purpose:
+   *    Render section header
+   * Params:
+   *    { section: { title }}: the title of the section
+   * Returns:
+   *    N/A
+   *************************************************************/
   _renderSectionHeader = ({ section: { title } }) => {
     return <Text style={Styles.sectionHeader}>{title}</Text>;
   };
 
-  // rendering data for item list
+  /************************************************************
+   * Purpose:
+   *    Render items in the SectionList
+   * Params:
+   *    index: the index of the item in the section
+   *    section: the section where the item is in
+   * Returns:
+   *    N/A
+   *************************************************************/
   _renderItem = ({ index, section }) => {
+    // Get the number of columns from the state
     const numColumns = this.state.numCols;
 
+    // Avoid rendering the item that has been rendered
+    // Ex. if column is set to 2, the first two items should be rendered
+    // at once, which the indexes of the first two items are 0 and 1.
+    // The result of 1 mod 2 is 1 which we want to skip.
     if (index % numColumns !== 0) return null;
 
+    // Initalize a list of compoents
     const items = [];
 
+    // Render one row at a time
     for (let i = index; i < index + numColumns; i++) {
       items.push(
         // if it has uneven items, then add an empty cell
@@ -304,10 +379,19 @@ export default class HomeScreen extends Component {
         )
       );
     }
+
+    // Finally return the rendered section
     return <View style={Styles.sectionListContainer}>{items}</View>;
   };
 
-  // return a list of selected items
+  /************************************************************
+   * Purpose:
+   *    Get a list of items that their quantities are non-zero
+   * Params:
+   *    N/A
+   * Returns:
+   *    selectedItems: a list of items that their quantities are non-zero
+   *************************************************************/
   _getSelectedItems = () => {
     let selectedItems = [];
     this.state.itemData.forEach(item => {
@@ -318,9 +402,18 @@ export default class HomeScreen extends Component {
     return selectedItems;
   };
 
-  // return a string of current day+month
+  /************************************************************
+   * Purpose:
+   *    Get a unique order number for each order
+   * Params:
+   *    N/A
+   * Returns:
+   *    return a string of a unique order number
+   *************************************************************/
   _getDate = () => {
+    // Get the current date
     const date = new Date();
+    // The unique format is month + day + hour + minute
     return (
       (date.getMonth() + 1).toLocaleString("en-us", { month: "long" }) +
       date.getDate().toString() +
@@ -329,7 +422,14 @@ export default class HomeScreen extends Component {
     );
   };
 
-  // Main()
+  /************************************************************
+   * Purpose:
+   *    Render the home page
+   * Params:
+   *    N/A
+   * Returns:
+   *    N/A
+   *************************************************************/
   render() {
     const { navigate } = this.props.navigation;
     return (
@@ -368,7 +468,7 @@ export default class HomeScreen extends Component {
             ${this.state.totalPrice.toFixed(2)}
           </Text>
           {this.state.status === 0 ? (
-            //  Go to Cart View
+            // Go to Cart View
             <Button
               disabled={this.state.totalItem === 0}
               title="Cart"
@@ -376,6 +476,8 @@ export default class HomeScreen extends Component {
               textStyle={Styles.cartText}
               containerViewStyle={Styles.cartContainerView}
               onPress={() =>
+                // Arguments that will be passed to the page that is going to
+                // navigate to
                 navigate("Cart", {
                   orderItems: this._getSelectedItems(),
                   orderNo: this.state.tableNo.toString() + this._getDate(),
@@ -388,14 +490,13 @@ export default class HomeScreen extends Component {
               }
             />
           ) : (
-            //Go to Order View
+            // Go to Order View
             <Button
-              disabled={this.state.totalItem === 0}
               title="Order"
               buttonStyle={Styles.cartButton}
               textStyle={Styles.cartText}
               containerViewStyle={Styles.cartContainerView}
-              //onPress={() => navigate("OrderView", {})}
+              onPress={() => navigate("Order", {})}
             />
           )}
         </View>

@@ -180,7 +180,7 @@ export default StyleSheet.create({
     margin: 5
   },
   searchBarTextInput: {
-    padding: 12,
+    padding: 10,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5

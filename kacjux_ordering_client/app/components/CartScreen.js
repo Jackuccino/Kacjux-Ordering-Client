@@ -1,3 +1,10 @@
+/*************************************************************
+ * Cart page
+ *
+ * Author:		JinJie Xu
+ * Date Created:	2/1/2019
+ **************************************************************/
+
 import React, { Component } from "react";
 import {
   Text,
@@ -14,7 +21,7 @@ import Styles from "../styles/StyleSheet";
 import { postNewOrder } from "../services/Server";
 
 export default class CartScreen extends Component {
-  // Header bar
+  // Render the header of the navigation bar
   static navigationOptions = ({ navigation }) => ({
     headerTitle: <Text style={Styles.title}>Cart</Text>,
     headerLeft: (
@@ -33,16 +40,33 @@ export default class CartScreen extends Component {
     )
   });
 
+  /************************************************************
+   * Purpose:
+   *    Initial states
+   * Params:
+   *    Properties that get passed to this component
+   * Returns:
+   *    N/A
+   *************************************************************/
   constructor(props) {
     super(props);
     const { navigation } = this.props;
     this.state = {
+      // Holds the selected items and gets from navigation parameter
       orderItems: navigation.getParam("orderItems", null),
+      // Holds the order number and gets from navigation parameter
       orderNo: navigation.getParam("orderNo", null)
     };
   }
 
-  // Save order to database
+  /************************************************************
+   * Purpose:
+   *    Call api and post the order to the database
+   * Params:
+   *    N/A
+   * Returns:
+   *    N/A
+   *************************************************************/
   _submitOrdersHandler = () => {
     const { navigation } = this.props;
 
@@ -70,8 +94,10 @@ export default class CartScreen extends Component {
       postNewOrder(newOrder)
         .then(res => {
           if (res.result === "ok") {
-            // success
-            // go to order view
+            // success and go back to home page
+            navigation.goBack();
+            // 1 means order submitted
+            navigation.state.params.onBack(0, 0, 1, "");
           } else {
             console.log("Place order failed.");
           }
@@ -80,51 +106,76 @@ export default class CartScreen extends Component {
           console.log(err);
         });
     });
-
-    navigation.goBack();
-    // 1 means order submitted
-    navigation.state.params.onBack(0, 0, 1, "");
   };
 
-  // handler for adding an item
-  _itemPlusHandler = id => {
-    const data = this.state.orderItems.find(d => d.id === id);
-    data.quantity++;
+  /************************************************************
+   * Purpose:
+   *    Add the quantity of the item and update total item and price
+   * Params:
+   *    item: the item that is pressed
+   * Returns:
+   *    N/A
+   *************************************************************/
+  _itemPlusHandler = item => {
+    item.quantity++;
     this._addTotalItem();
-    this._addTotalPrice(data.price);
+    this._addTotalPrice(item.price);
     // Tell counter to update the orderItem
     this.setState({ orderItem: this.state.orderItems });
 
     // increment recursively when holding button
-    //this.timer = setTimeout(this._itemPlusHandler.bind(this, id), 85);
+    //this.timer = setTimeout(this._itemPlusHandler.bind(this, item), 85);
   };
 
-  // handler for removing an item
-  _itemMinusHandler = id => {
+  /************************************************************
+   * Purpose:
+   *    Minus the quantity of the item and update total item and price
+   * Params:
+   *    item: the item that is pressed
+   * Returns:
+   *    N/A
+   *************************************************************/
+  _itemMinusHandler = item => {
+    // If the total item is 1, which means this is the last item to be deleted
+    // Go back to home screen since the cart will be empty
     const { navigation } = this.props;
     if (navigation.getParam("totalItem", 0) === 1) {
       navigation.goBack();
       navigation.state.params.onBack(0, 0, 0, navigation.getParam("note", ""));
     }
 
-    const data = this.state.orderItems.find(d => d.id === id);
-    if (data.quantity > 0) {
-      data.quantity--;
+    if (item.quantity > 0) {
+      item.quantity--;
       this._minusTotalItem();
-      this._minusTotalPrice(data.price);
+      this._minusTotalPrice(item.price);
     }
     // Tell counter to update the orderItem
     this.setState({ orderItem: this.state.orderItems });
 
-    // increment recursively when holding button
-    //this.timer = setTimeout(this._itemMinusHandler.bind(this, id), 85);
+    // increment continuously when holding button
+    //this.timer = setTimeout(this._itemMinusHandler.bind(this, item), 85);
   };
 
-  // increment recursively when holding button
+  /************************************************************
+   * Purpose:
+   *    Stop the timer used for incrementing continuously when holding button
+   * Params:
+   *    N/A
+   * Returns:
+   *    N/A
+   *************************************************************/
   // _stopTimer = () => {
   //   clearTimeout(this.timer);
   // };
 
+  /************************************************************
+   * Purpose:
+   *    Add to total price in the state
+   * Params:
+   *    price: the price that needs to be added to total price
+   * Returns:
+   *    N/A
+   *************************************************************/
   _addTotalPrice = price => {
     const { navigation } = this.props;
     navigation.setParams({
@@ -132,6 +183,14 @@ export default class CartScreen extends Component {
     });
   };
 
+  /************************************************************
+   * Purpose:
+   *    Subtract from total price in the state
+   * Params:
+   *    price: the price that needs to be subtracted from total price
+   * Returns:
+   *    N/A
+   *************************************************************/
   _minusTotalPrice = price => {
     const { navigation } = this.props;
     navigation.setParams({
@@ -139,6 +198,14 @@ export default class CartScreen extends Component {
     });
   };
 
+  /************************************************************
+   * Purpose:
+   *    Add 1 to total item in the state
+   * Params:
+   *    N/A
+   * Returns:
+   *    N/A
+   *************************************************************/
   _addTotalItem = () => {
     const { navigation } = this.props;
     navigation.setParams({
@@ -146,6 +213,14 @@ export default class CartScreen extends Component {
     });
   };
 
+  /************************************************************
+   * Purpose:
+   *    Subtract 1 from total item in the state
+   * Params:
+   *    N/A
+   * Returns:
+   *    N/A
+   *************************************************************/
   _minusTotalItem = () => {
     const { navigation } = this.props;
     navigation.setParams({
@@ -153,35 +228,56 @@ export default class CartScreen extends Component {
     });
   };
 
-  // delete items in cart
-  _deleteItem = id => {
+  /************************************************************
+   * Purpose:
+   *    Delete an item from the cart
+   * Params:
+   *    N/A
+   * Returns:
+   *    N/A
+   *************************************************************/
+  _deleteItem = item => {
+    // Same as _itemMinusHandler
+    // If the total item is 1, which means this is the last item to be deleted
+    // Go back to home screen since the cart will be empty
     const { navigation } = this.props;
     if (navigation.getParam("totalItem", 0) === 1) {
       navigation.goBack();
       navigation.state.params.onBack(0, 0, 0, navigation.getParam("note", ""));
     }
 
-    const item = this.state.orderItems.find(i => i.id == id);
     const totalItem = navigation.getParam("totalItem", 0);
     const totalPrice = navigation.getParam("totalPrice", 0);
 
+    // Update total number of items
     if (totalItem > 0) {
       navigation.setParams({
         totalItem: totalItem - item.quantity
       });
     }
+
+    // Update total price
     if (totalPrice > 0) {
       navigation.setParams({
         totalPrice: totalPrice - (item.quantity * item.price).toFixed(2)
       });
     }
+
+    // Quantity of the item is set to 0 because the entire item is deleted
     item.quantity = 0;
 
     // Tell counter to update the orderItem
     this.setState({ orderItem: this.state.orderItems });
   };
 
-  // rendering data for item list
+  /************************************************************
+   * Purpose:
+   *    Render items in the FlatList
+   * Params:
+   *    item: the corresponding item in the FlatList
+   * Returns:
+   *    N/A
+   *************************************************************/
   _renderItem = ({ item }) => {
     return item.quantity == 0 ? null : (
       <View style={Styles.cartItemList}>
@@ -204,7 +300,7 @@ export default class CartScreen extends Component {
             containerViewStyle={{ borderRadius: 30 }}
             borderRadius={30}
             buttonStyle={Styles.itemMinusButton}
-            onPress={this._itemMinusHandler.bind(this, item.id)}
+            onPress={this._itemMinusHandler.bind(this, item)}
             //onPressIn={this._itemMinusHandler.bind(this, item.id)}
             //onPressOut={this._stopTimer}
           />
@@ -216,7 +312,7 @@ export default class CartScreen extends Component {
             containerViewStyle={{ borderRadius: 30 }}
             borderRadius={30}
             buttonStyle={Styles.itemPlusButton}
-            onPress={this._itemPlusHandler.bind(this, item.id)}
+            onPress={this._itemPlusHandler.bind(this, item)}
             //onPressIn={this._itemPlusHandler.bind(this, item.id)}
             //onPressOut={this._stopTimer}
           />
@@ -227,12 +323,20 @@ export default class CartScreen extends Component {
           color="red"
           type="material-community"
           size={40}
-          onPress={this._deleteItem.bind(this, item.id)}
+          onPress={this._deleteItem.bind(this, item)}
         />
       </View>
     );
   };
 
+  /************************************************************
+   * Purpose:
+   *    Render the cart page
+   * Params:
+   *    N/A
+   * Returns:
+   *    N/A
+   *************************************************************/
   render() {
     const { navigation } = this.props;
     return (
