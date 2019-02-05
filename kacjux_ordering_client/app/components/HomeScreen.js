@@ -51,6 +51,8 @@ export default class HomeScreen extends Component {
       totalItem: 0,
       // Table number
       tableNo: 1,
+      // unique order number
+      orderNo: 0,
       // Determine if an order has submitted
       status: 0,
       // Note that entered in cart view
@@ -404,11 +406,11 @@ export default class HomeScreen extends Component {
 
   /************************************************************
    * Purpose:
-   *    Get a unique order number for each order
+   *    Get a string of current date time
    * Params:
    *    N/A
    * Returns:
-   *    return a string of a unique order number
+   *    return a string of current date time
    *************************************************************/
   _getDate = () => {
     // Get the current date
@@ -420,6 +422,19 @@ export default class HomeScreen extends Component {
       date.getHours().toString() +
       date.getMinutes().toString()
     );
+  };
+
+  /************************************************************
+   * Purpose:
+   *    Save a unique order number
+   * Params:
+   *    N/A
+   * Returns:
+   *    return a string of a unique order number
+   *************************************************************/
+  _setOrderNo = () => {
+    this.setState({ orderNo: this.state.tableNo.toString() + this._getDate() });
+    return this.state.orderNo;
   };
 
   /************************************************************
@@ -480,7 +495,7 @@ export default class HomeScreen extends Component {
                 // navigate to
                 navigate("Cart", {
                   orderItems: this._getSelectedItems(),
-                  orderNo: this.state.tableNo.toString() + this._getDate(),
+                  orderNo: this._setOrderNo(),
                   totalItem: this.state.totalItem,
                   totalPrice: this.state.totalPrice,
                   note: this.state.note,
