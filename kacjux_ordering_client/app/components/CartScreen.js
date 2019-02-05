@@ -237,15 +237,6 @@ export default class CartScreen extends Component {
    *    N/A
    *************************************************************/
   _deleteItem = item => {
-    // Same as _itemMinusHandler
-    // If the total item is 1, which means this is the last item to be deleted
-    // Go back to home screen since the cart will be empty
-    const { navigation } = this.props;
-    if (navigation.getParam("totalItem", 0) === 1) {
-      navigation.goBack();
-      navigation.state.params.onBack(0, 0, 0, navigation.getParam("note", ""));
-    }
-
     const totalItem = navigation.getParam("totalItem", 0);
     const totalPrice = navigation.getParam("totalPrice", 0);
 
@@ -254,6 +245,15 @@ export default class CartScreen extends Component {
       navigation.setParams({
         totalItem: totalItem - item.quantity
       });
+    }
+
+    // Same as _itemMinusHandler
+    // If the total item is 1, which means this is the last item to be deleted
+    // Go back to home screen since the cart will be empty
+    const { navigation } = this.props;
+    if (navigation.getParam("totalItem", 0) === 0) {
+      navigation.goBack();
+      navigation.state.params.onBack(0, 0, 0, navigation.getParam("note", ""));
     }
 
     // Update total price
