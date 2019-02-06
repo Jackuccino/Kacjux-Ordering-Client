@@ -73,6 +73,7 @@ export default class CartScreen extends Component {
 
     // Make a deep copy of the order items before changing quantities to 0
     const copyOrderItems = JSON.parse(JSON.stringify(this.state.orderItems));
+    let success = false;
 
     // Note and table number is the same for each item, so define before loop
     const note = navigation.getParam("note", "");
@@ -80,7 +81,7 @@ export default class CartScreen extends Component {
     const orderNo = this.state.orderNo;
 
     // Send request
-    this.state.orderItems.forEach(item => {
+    this.state.orderItems.forEach(async item => {
       // Send each new order to the database
       const quantity = item.quantity;
       item.quantity = 0;
@@ -98,27 +99,28 @@ export default class CartScreen extends Component {
       };
 
       // Call api and save to database
-      postNewOrder(newOrder)
-        .then(res => {
-          if (res.result === "ok") {
-            navigation.goBack();
-            // 1 means order submitted
-            navigation.state.params.onBack(
-              copyOrderItems,
-              0,
-              0,
-              1,
-              note,
-              orderNo
-            );
-          } else {
-            console.log("Place order failed.");
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        });
+      const res = await postNewOrder(newOrder);
+      console.log("res.ok: ", res.ok);
+      if (res.ok) {
+        success = true;
+        console.log("success in res: ", success);
+      } else {
+        success = false;
+        console.log("Place order failed.");
+      }
+
+      console.log("success after res: ", success);
     });
+
+    console.log("success after loop: ", success);
+
+    if (success) {
+      navigation.goBack();
+      // 1 means order submitted
+      navigation.state.params.onBack(copyOrderItems, 0, 0, 1, note, orderNo);
+    } else {
+      console.log("success in else:", success);
+    }
   };
 
   /************************************************************
