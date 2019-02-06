@@ -135,7 +135,7 @@ export default StyleSheet.create({
   cartItemList: {
     flex: 1,
     flexDirection: "row",
-    marginBottom: 5
+    margin: 5
   },
   textAreaContainer: {
     borderColor: "lightgrey",
@@ -201,5 +201,13 @@ export default StyleSheet.create({
   },
   searchBarContainer: {
     padding: 5
+  },
+  summaryCancelButton: {
+    flex: 1,
+    alignItems: "center",
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    height: 70
   }
 });

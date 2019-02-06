@@ -43,6 +43,8 @@ export default class HomeScreen extends Component {
       titleData: [],
       // Holds all the menu items from the database
       itemData: [],
+      // Holds the ordered items
+      orderItems: [],
       // Number of columns in the menu
       numCols: 2,
       // Total price of all selected items
@@ -176,12 +178,14 @@ export default class HomeScreen extends Component {
    * Returns:
    *    N/A
    *************************************************************/
-  _updateData = (totalItem, totalPrice, status, note) => {
+  _updateData = (orderItems, totalItem, totalPrice, status, note, orderNo) => {
     this.setState({
+      orderItems: orderItems,
       totalItem: totalItem,
       totalPrice: totalPrice,
       status: status,
-      note: note
+      note: note,
+      orderNo: orderNo
     });
   };
 
@@ -394,7 +398,7 @@ export default class HomeScreen extends Component {
    * Returns:
    *    selectedItems: a list of items that their quantities are non-zero
    *************************************************************/
-  _getSelectedItems = () => {
+  _setSelectedItems = () => {
     let selectedItems = [];
     this.state.itemData.forEach(item => {
       selectedItems = selectedItems.concat(
@@ -433,8 +437,7 @@ export default class HomeScreen extends Component {
    *    return a string of a unique order number
    *************************************************************/
   _setOrderNo = () => {
-    this.setState({ orderNo: this.state.tableNo.toString() + this._getDate() });
-    return this.state.orderNo;
+    return this.state.tableNo.toString() + this._getDate();
   };
 
   /************************************************************
@@ -482,7 +485,7 @@ export default class HomeScreen extends Component {
           <Text style={Styles.totalPrice}>
             ${this.state.totalPrice.toFixed(2)}
           </Text>
-          {this.state.status === 0 ? (
+          {this.state.status !== 1 ? (
             // Go to Cart View
             <Button
               disabled={this.state.totalItem === 0}
@@ -490,19 +493,19 @@ export default class HomeScreen extends Component {
               buttonStyle={Styles.cartButton}
               textStyle={Styles.cartText}
               containerViewStyle={Styles.cartContainerView}
-              onPress={() =>
-                // Arguments that will be passed to the page that is going to
-                // navigate to
+              onPress={() => {
+                // navigate to Cart
                 navigate("Cart", {
-                  orderItems: this._getSelectedItems(),
+                  orderItems: this._setSelectedItems(),
                   orderNo: this._setOrderNo(),
                   totalItem: this.state.totalItem,
                   totalPrice: this.state.totalPrice,
                   note: this.state.note,
                   tableNum: this.state.tableNo,
                   onBack: this._updateData
-                })
-              }
+                });
+              }}
+              extraData={this.state}
             />
           ) : (
             // Go to Order View
@@ -511,7 +514,21 @@ export default class HomeScreen extends Component {
               buttonStyle={Styles.cartButton}
               textStyle={Styles.cartText}
               containerViewStyle={Styles.cartContainerView}
-              onPress={() => navigate("Order", {})}
+              onPress={() => {
+                let totalItem = 0;
+                let totalPrice = 0;
+                this.state.orderItems.forEach(item => {
+                  totalItem += item.quantity;
+                  totalPrice += item.price * item.quantity;
+                });
+                navigate("Order", {
+                  orderItems: this.state.orderItems,
+                  orderNo: this.state.orderNo,
+                  totalItem: totalItem,
+                  totalPrice: totalPrice,
+                  note: this.state.note
+                });
+              }}
             />
           )}
         </View>

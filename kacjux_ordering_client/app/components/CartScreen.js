@@ -30,6 +30,7 @@ export default class CartScreen extends Component {
         onPress={() => {
           navigation.goBack();
           navigation.state.params.onBack(
+            null,
             navigation.getParam("totalItem", 0),
             navigation.getParam("totalPrice", 0),
             0,
@@ -70,6 +71,14 @@ export default class CartScreen extends Component {
   _submitOrdersHandler = () => {
     const { navigation } = this.props;
 
+    // Make a deep copy of the order items before changing quantities to 0
+    const copyOrderItems = JSON.parse(JSON.stringify(this.state.orderItems));
+
+    // Note and table number is the same for each item, so define before loop
+    const note = navigation.getParam("note", "");
+    const tableNum = navigation.getParam("tableNum", 1);
+    const orderNo = this.state.orderNo;
+
     // Send request
     this.state.orderItems.forEach(item => {
       // Send each new order to the database
@@ -77,12 +86,10 @@ export default class CartScreen extends Component {
       item.quantity = 0;
       const totalPrice = item.price * quantity;
       const orderItem = item.id;
-      const note = navigation.getParam("note", "");
-      const tableNum = navigation.getParam("tableNum", 1);
 
       // Create an Order object
       const newOrder = {
-        OrderNo: this.state.orderNo,
+        OrderNo: orderNo,
         TotalPrice: `$${totalPrice}`,
         OrderItem: orderItem,
         Quantity: quantity,
@@ -94,10 +101,16 @@ export default class CartScreen extends Component {
       postNewOrder(newOrder)
         .then(res => {
           if (res.result === "ok") {
-            // success and go back to home page
             navigation.goBack();
             // 1 means order submitted
-            navigation.state.params.onBack(0, 0, 1, "");
+            navigation.state.params.onBack(
+              copyOrderItems,
+              0,
+              0,
+              1,
+              note,
+              orderNo
+            );
           } else {
             console.log("Place order failed.");
           }
@@ -237,7 +250,17 @@ export default class CartScreen extends Component {
    *    N/A
    *************************************************************/
   _deleteItem = item => {
+    const { navigation } = this.props;
     const totalItem = navigation.getParam("totalItem", 0);
+
+    // Same as _itemMinusHandler
+    // If the total item is 1, which means this is the last item to be deleted
+    // Go back to home screen since the cart will be empty
+    if (totalItem - item.quantity === 0) {
+      navigation.goBack();
+      navigation.state.params.onBack(0, 0, 0, navigation.getParam("note", ""));
+    }
+
     const totalPrice = navigation.getParam("totalPrice", 0);
 
     // Update total number of items
@@ -245,15 +268,6 @@ export default class CartScreen extends Component {
       navigation.setParams({
         totalItem: totalItem - item.quantity
       });
-    }
-
-    // Same as _itemMinusHandler
-    // If the total item is 1, which means this is the last item to be deleted
-    // Go back to home screen since the cart will be empty
-    const { navigation } = this.props;
-    if (navigation.getParam("totalItem", 0) === 0) {
-      navigation.goBack();
-      navigation.state.params.onBack(0, 0, 0, navigation.getParam("note", ""));
     }
 
     // Update total price
