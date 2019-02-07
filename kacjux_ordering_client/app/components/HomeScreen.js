@@ -75,16 +75,17 @@ export default class HomeScreen extends Component {
    * Returns:
    *    N/A
    *************************************************************/
-  _getItems = () => {
+  _getItems = async () => {
     let titles = []; // holds the types of each item
     let datas = []; // holds all the items fetched from the database
     let section = null; // holds a section in the sectionlist
 
     // Using Promise to fetch items from the database
-    const result = getAllItems()
-      .then(res => {
-        if (res.result === "ok") {
-          const items = res.items;
+    await getAllItems()
+      .then(async res => {
+        if (res.ok) {
+          const resJson = await res.json();
+          const items = resJson.items;
           items.forEach(item => {
             const data = {
               id: item.ItemId,

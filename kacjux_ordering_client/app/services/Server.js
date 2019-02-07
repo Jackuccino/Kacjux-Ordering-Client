@@ -1,10 +1,8 @@
-import { Alert } from "react-native";
-
 const apiPostNewOrder = "http://96.41.173.63:8080/api/orders/";
 const apiGetAllItems = "http://96.41.173.63:8080/api/items/";
 
-exports.postNewOrder = async params => {
-  return await fetch(apiPostNewOrder, {
+exports.postNewOrder = params => {
+  return fetch(apiPostNewOrder, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -12,20 +10,8 @@ exports.postNewOrder = async params => {
     },
     body: JSON.stringify(params)
   });
-  // .then(res => {
-  //   return res.json();
-  // })
-  // .catch(err => {
-  //   console.log(err);
-  // });
 };
 
 exports.getAllItems = () => {
-  return fetch(apiGetAllItems)
-    .then(res => {
-      return res.json();
-    })
-    .catch(err => {
-      console.log(err);
-    });
+  return fetch(apiGetAllItems);
 };
