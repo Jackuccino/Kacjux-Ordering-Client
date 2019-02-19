@@ -30,7 +30,6 @@ export default class OrderScreen extends Component {
         name={"arrow-back"}
         onPress={() => {
           navigation.goBack();
-          console.log(navigation.getParam("orderItems", null));
           navigation.state.params.onBack(
             navigation.getParam("orderItems", null),
             0,
@@ -84,7 +83,21 @@ export default class OrderScreen extends Component {
 
     const newOrderItems = navigation.getParam("newOrderItems", null);
     if (Array.isArray(newOrderItems) && newOrderItems.length > 0) {
-      this._submitOrdersHandler(newOrderItems);
+      newOrderItems.forEach(item => {
+        const check = this.state.orderItems.filter(oi => oi.id === item.id);
+        if (check.length === 0) {
+          this.state.orderItems = this.state.orderItems.concat(
+            JSON.parse(JSON.stringify(item))
+          );
+          this._submitOrdersHandler(item);
+        } else {
+          check.forEach(checkItem => {
+            checkItem.quantity += item.quantity;
+            this._modifyOrderHandler(checkItem, 3);
+          });
+        }
+      });
+      navigation.setParams({ orderItems: this.state.orderItems });
     }
   }
 
@@ -96,7 +109,7 @@ export default class OrderScreen extends Component {
    * Returns:
    *    N/A
    *************************************************************/
-  _submitOrdersHandler = async newOrderItems => {
+  _submitOrdersHandler = async item => {
     const { navigation } = this.props;
 
     let success = false;
@@ -107,36 +120,34 @@ export default class OrderScreen extends Component {
     const orderNo = this.state.orderNo;
 
     // Send request
-    for (const item of newOrderItems) {
-      // Send each new order to the database
-      const quantity = item.quantity;
-      const totalPrice = item.price * quantity;
-      const orderItem = item.id;
+    // Send each new order to the database
+    const quantity = item.quantity;
+    const totalPrice = item.price * quantity;
+    const orderItem = item.id;
 
-      // Create an Order object
-      const newOrder = {
-        OrderNo: orderNo,
-        TotalPrice: `$${totalPrice}`,
-        OrderItem: orderItem,
-        Quantity: quantity,
-        Note: note,
-        TableNum: tableNum
-      };
+    // Create an Order object
+    const newOrder = {
+      OrderNo: orderNo,
+      TotalPrice: `$${totalPrice}`,
+      OrderItem: orderItem,
+      Quantity: quantity,
+      Note: note,
+      TableNum: tableNum
+    };
 
-      // Call api and save to database
-      await postNewOrder(newOrder)
-        .then(res => {
-          if (res.ok) {
-            success = true;
-          } else {
-            success = false;
-            console.log("Place order failed.");
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    }
+    // Call api and save to database
+    await postNewOrder(newOrder)
+      .then(res => {
+        if (res.ok) {
+          success = true;
+        } else {
+          success = false;
+          console.log("Place order failed.");
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
 
     if (!success) {
       navigation.goBack();

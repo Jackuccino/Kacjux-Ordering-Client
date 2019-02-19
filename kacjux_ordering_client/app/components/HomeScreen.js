@@ -469,7 +469,7 @@ export default class HomeScreen extends Component {
       });
 
       selectedItems.forEach(item => {
-        itemNames += "\t•\t" + item.key + "\n";
+        itemNames += "\t•\t" + item.key + " x " + item.quantity + "\n";
       });
 
       Alert.alert(
@@ -494,17 +494,18 @@ export default class HomeScreen extends Component {
           {
             text: "OK",
             onPress: () => {
+              const newOrderItems = this.state.orderItems;
               const newItems = this._getSelectedItems();
+
               if (newItems.length > 0) {
                 newItems.forEach(item => {
-                  (totalItem += item.quantity),
-                    (totalPrice += item.price * item.quantity);
+                  totalItem += item.quantity;
+                  totalPrice += item.price * item.quantity;
                 });
               }
+
               navigate("Order", {
-                orderItems: this.state.orderItems.concat(
-                  JSON.parse(JSON.stringify(newItems))
-                ),
+                orderItems: newOrderItems,
                 newOrderItems: newItems,
                 orderNo: this.state.orderNo,
                 totalItem: totalItem,
