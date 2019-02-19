@@ -1,5 +1,9 @@
 const apiPostNewOrder = "http://96.41.173.63:8080/api/orders/";
 const apiGetAllItems = "http://96.41.173.63:8080/api/items/";
+const apiCancelOrder = "http://96.41.173.63:8080/api/orders/delete-order/";
+const apiModifyOrder = "http://96.41.173.63:8080/api/orders/change-quantity/";
+const apiDeleteItemFromOrder =
+  "http://96.41.173.63:8080/api/orders/remove-item/";
 
 exports.postNewOrder = params => {
   return fetch(apiPostNewOrder, {
@@ -14,4 +18,30 @@ exports.postNewOrder = params => {
 
 exports.getAllItems = () => {
   return fetch(apiGetAllItems);
+};
+
+exports.cancelOrder = id => {
+  return fetch(apiCancelOrder + id, { method: "DELETE" });
+};
+
+exports.modifyOrder = (id, params) => {
+  return fetch(apiModifyOrder + id, {
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    },
+    method: "PATCH",
+    body: JSON.stringify(params)
+  });
+};
+
+exports.deleteItemFromOrder = (id, params) => {
+  return fetch(apiDeleteItemFromOrder + id, {
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    },
+    method: "DELETE",
+    body: JSON.stringify(params)
+  });
 };

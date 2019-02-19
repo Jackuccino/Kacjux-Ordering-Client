@@ -527,7 +527,10 @@ export default class HomeScreen extends Component {
                   orderNo: this.state.orderNo,
                   totalItem: totalItem,
                   totalPrice: totalPrice,
-                  note: this.state.note
+                  note: this.state.note,
+                  tableNum: this.state.tableNo,
+                  editable: false,
+                  onBack: this._updateData
                 });
               }}
             />

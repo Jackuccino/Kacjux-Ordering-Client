@@ -135,7 +135,10 @@ export default StyleSheet.create({
   cartItemList: {
     flex: 1,
     flexDirection: "row",
-    margin: 5
+    marginTop: 5,
+    marginBottom: 5,
+    marginLeft: 20,
+    marginRight: 20
   },
   textAreaContainer: {
     borderColor: "lightgrey",
@@ -209,5 +212,10 @@ export default StyleSheet.create({
     bottom: 0,
     right: 0,
     height: 70
+  },
+  summaryItemQuantity: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 40
   }
 });

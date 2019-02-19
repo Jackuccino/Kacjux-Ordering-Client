@@ -292,7 +292,7 @@ export default class CartScreen extends Component {
    *    N/A
    *************************************************************/
   _renderItem = ({ item }) => {
-    return item.quantity == 0 ? null : (
+    return item.quantity === 0 ? null : (
       <View style={Styles.cartItemList}>
         {/* image */}
         <Image
