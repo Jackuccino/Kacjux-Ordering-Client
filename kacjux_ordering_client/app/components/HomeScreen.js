@@ -6,7 +6,7 @@
  **************************************************************/
 
 import React, { Component } from "react";
-import { Text, View, Image, SectionList } from "react-native";
+import { Text, View, Image, Alert } from "react-native";
 
 import { Button, Icon } from "react-native-elements";
 import IconBadge from "react-native-icon-badge";
@@ -180,6 +180,14 @@ export default class HomeScreen extends Component {
    *    N/A
    *************************************************************/
   _updateData = (orderItems, totalItem, totalPrice, status, note, orderNo) => {
+    if (totalItem === 0) {
+      this.state.itemData.forEach(item => {
+        item.data.forEach(data => {
+          if (data.quantity !== 0) data.quantity = 0;
+        });
+      });
+    }
+
     this.setState({
       orderItems: orderItems,
       totalItem: totalItem,
@@ -399,7 +407,7 @@ export default class HomeScreen extends Component {
    * Returns:
    *    selectedItems: a list of items that their quantities are non-zero
    *************************************************************/
-  _setSelectedItems = () => {
+  _getSelectedItems = () => {
     let selectedItems = [];
     this.state.itemData.forEach(item => {
       selectedItems = selectedItems.concat(
@@ -439,6 +447,104 @@ export default class HomeScreen extends Component {
    *************************************************************/
   _setOrderNo = () => {
     return this.state.tableNo.toString() + this._getDate();
+  };
+
+  _orderSummaryPageHandler = () => {
+    const { navigate } = this.props.navigation;
+    let totalItem = 0;
+    let totalPrice = 0;
+    this.state.orderItems.forEach(item => {
+      totalItem += item.quantity;
+      totalPrice += item.price * item.quantity;
+    });
+
+    if (this.state.totalItem > 0) {
+      let itemNames = "";
+      let selectedItems = [];
+
+      this.state.itemData.forEach(item => {
+        selectedItems = selectedItems.concat(
+          item.data.filter(d => d.quantity !== 0)
+        );
+      });
+
+      selectedItems.forEach(item => {
+        itemNames += "\t•\t" + item.key + "\n";
+      });
+
+      Alert.alert(
+        "Warning",
+        "Adding the following items to the order\n\n" + itemNames,
+        [
+          {
+            text: "Cancel",
+            onPress: () => {
+              this.state.itemData.forEach(item => {
+                item.data.forEach(data => {
+                  if (data.quantity !== 0) data.quantity = 0;
+                });
+              });
+              this.setState({
+                totalItem: 0,
+                totalPrice: 0
+              });
+            },
+            style: "cancel"
+          },
+          {
+            text: "OK",
+            onPress: () => {
+              const newItems = this._getSelectedItems();
+              if (newItems.length > 0) {
+                newItems.forEach(item => {
+                  (totalItem += item.quantity),
+                    (totalPrice += item.price * item.quantity);
+                });
+              }
+              navigate("Order", {
+                orderItems: this.state.orderItems.concat(
+                  JSON.parse(JSON.stringify(newItems))
+                ),
+                newOrderItems: newItems,
+                orderNo: this.state.orderNo,
+                totalItem: totalItem,
+                totalPrice: totalPrice,
+                note: this.state.note,
+                tableNum: this.state.tableNo,
+                editable: false,
+                onBack: this._updateData
+              });
+            }
+          }
+        ],
+        { cancelable: false }
+      );
+    } else {
+      navigate("Order", {
+        orderItems: this.state.orderItems,
+        orderNo: this.state.orderNo,
+        totalItem: totalItem,
+        totalPrice: totalPrice,
+        note: this.state.note,
+        tableNum: this.state.tableNo,
+        editable: false,
+        onBack: this._updateData
+      });
+    }
+  };
+
+  _cartPageHandler = () => {
+    const { navigate } = this.props.navigation;
+    // navigate to Cart
+    navigate("Cart", {
+      orderItems: this._getSelectedItems(),
+      orderNo: this._setOrderNo(),
+      totalItem: this.state.totalItem,
+      totalPrice: this.state.totalPrice,
+      note: this.state.note,
+      tableNum: this.state.tableNo,
+      onBack: this._updateData
+    });
   };
 
   /************************************************************
@@ -494,18 +600,7 @@ export default class HomeScreen extends Component {
               buttonStyle={Styles.cartButton}
               textStyle={Styles.cartText}
               containerViewStyle={Styles.cartContainerView}
-              onPress={() => {
-                // navigate to Cart
-                navigate("Cart", {
-                  orderItems: this._setSelectedItems(),
-                  orderNo: this._setOrderNo(),
-                  totalItem: this.state.totalItem,
-                  totalPrice: this.state.totalPrice,
-                  note: this.state.note,
-                  tableNum: this.state.tableNo,
-                  onBack: this._updateData
-                });
-              }}
+              onPress={this._cartPageHandler}
               extraData={this.state}
             />
           ) : (
@@ -515,24 +610,7 @@ export default class HomeScreen extends Component {
               buttonStyle={Styles.cartButton}
               textStyle={Styles.cartText}
               containerViewStyle={Styles.cartContainerView}
-              onPress={() => {
-                let totalItem = 0;
-                let totalPrice = 0;
-                this.state.orderItems.forEach(item => {
-                  totalItem += item.quantity;
-                  totalPrice += item.price * item.quantity;
-                });
-                navigate("Order", {
-                  orderItems: this.state.orderItems,
-                  orderNo: this.state.orderNo,
-                  totalItem: totalItem,
-                  totalPrice: totalPrice,
-                  note: this.state.note,
-                  tableNum: this.state.tableNo,
-                  editable: false,
-                  onBack: this._updateData
-                });
-              }}
+              onPress={this._orderSummaryPageHandler}
             />
           )}
         </View>

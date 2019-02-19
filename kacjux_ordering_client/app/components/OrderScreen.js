@@ -12,7 +12,8 @@ import { Button, Icon } from "react-native-elements";
 import {
   cancelOrder,
   modifyOrder,
-  deleteItemFromOrder
+  deleteItemFromOrder,
+  postNewOrder
 } from "../services/Server";
 import Styles from "../styles/StyleSheet";
 
@@ -23,6 +24,23 @@ export default class OrderScreen extends Component {
       <Text style={Styles.title}>
         Order Number: {navigation.getParam("orderNo", null)}
       </Text>
+    ),
+    headerLeft: (
+      <Icon
+        name={"arrow-back"}
+        onPress={() => {
+          navigation.goBack();
+          console.log(navigation.getParam("orderItems", null));
+          navigation.state.params.onBack(
+            navigation.getParam("orderItems", null),
+            0,
+            0,
+            1,
+            navigation.getParam("note", ""),
+            navigation.getParam("orderNo", null)
+          );
+        }}
+      />
     ),
     headerRight:
       navigation.getParam("editable", null) === true ? (
@@ -63,7 +81,67 @@ export default class OrderScreen extends Component {
       // Holds the order number and gets from navigation parameter
       orderNo: navigation.getParam("orderNo", null)
     };
+
+    const newOrderItems = navigation.getParam("newOrderItems", null);
+    if (Array.isArray(newOrderItems) && newOrderItems.length > 0) {
+      this._submitOrdersHandler(newOrderItems);
+    }
   }
+
+  /************************************************************
+   * Purpose:
+   *    Call api and post the new order to the database
+   * Params:
+   *    N/A
+   * Returns:
+   *    N/A
+   *************************************************************/
+  _submitOrdersHandler = async newOrderItems => {
+    const { navigation } = this.props;
+
+    let success = false;
+
+    // Note and table number is the same for each item, so define before loop
+    const note = navigation.getParam("note", "");
+    const tableNum = navigation.getParam("tableNum", 1);
+    const orderNo = this.state.orderNo;
+
+    // Send request
+    for (const item of newOrderItems) {
+      // Send each new order to the database
+      const quantity = item.quantity;
+      const totalPrice = item.price * quantity;
+      const orderItem = item.id;
+
+      // Create an Order object
+      const newOrder = {
+        OrderNo: orderNo,
+        TotalPrice: `$${totalPrice}`,
+        OrderItem: orderItem,
+        Quantity: quantity,
+        Note: note,
+        TableNum: tableNum
+      };
+
+      // Call api and save to database
+      await postNewOrder(newOrder)
+        .then(res => {
+          if (res.ok) {
+            success = true;
+          } else {
+            success = false;
+            console.log("Place order failed.");
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
+
+    if (!success) {
+      navigation.goBack();
+    }
+  };
 
   /************************************************************
    * Purpose:
@@ -177,8 +255,6 @@ export default class OrderScreen extends Component {
     this._addTotalItem();
     this._addTotalPrice(item.price);
     this._modifyOrderHandler(item, 1);
-    // Tell counter to update the orderItem
-    this.setState({ orderItem: this.state.orderItems });
 
     // increment recursively when holding button
     //this.timer = setTimeout(this._itemPlusHandler.bind(this, item), 85);
@@ -268,8 +344,6 @@ export default class OrderScreen extends Component {
       if (item.quantity > 0) this._modifyOrderHandler(item, 0);
       else this._deleteItemFromOrderHandler(item);
     }
-    // Tell counter to update the orderItem
-    this.setState({ orderItem: this.state.orderItems });
 
     // increment continuously when holding button
     //this.timer = setTimeout(this._itemMinusHandler.bind(this, item), 85);
@@ -327,9 +401,6 @@ export default class OrderScreen extends Component {
 
     // delete from database as well
     this._deleteItemFromOrderHandler(item);
-
-    // Tell counter to update the orderItem
-    this.setState({ orderItem: this.state.orderItems });
   };
 
   /************************************************************

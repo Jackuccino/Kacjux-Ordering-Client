@@ -34,7 +34,8 @@ export default class CartScreen extends Component {
             navigation.getParam("totalItem", 0),
             navigation.getParam("totalPrice", 0),
             0,
-            navigation.getParam("note", "")
+            navigation.getParam("note", ""),
+            navigation.getParam("orderNo", null)
           );
         }}
       />
@@ -84,7 +85,6 @@ export default class CartScreen extends Component {
     for (const item of this.state.orderItems) {
       // Send each new order to the database
       const quantity = item.quantity;
-      item.quantity = 0;
       const totalPrice = item.price * quantity;
       const orderItem = item.id;
 
