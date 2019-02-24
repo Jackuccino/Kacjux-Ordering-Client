@@ -18,14 +18,7 @@ import CategoryMenu from "./CategoryMenu";
 export default class HomeScreen extends Component {
   // Render the header of the navigation bar
   static navigationOptions = {
-    headerTitle: <Text style={Styles.title}>Table# 1</Text>,
-    headerRight: (
-      <View style={Styles.horizontalView}>
-        <Button title="My Profile" />
-        <Button title="Login" />
-        <Button title="Sign up" />
-      </View>
-    )
+    headerTitle: <Text style={Styles.title}>Table# 1</Text>
   };
 
   /************************************************************
@@ -62,7 +55,9 @@ export default class HomeScreen extends Component {
     };
     // For press and hold to add items to order
     // this.timer = null;
+  }
 
+  componentDidMount() {
     // Get all items from the database
     this._getItems();
   }

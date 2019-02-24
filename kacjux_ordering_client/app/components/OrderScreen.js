@@ -1,3 +1,10 @@
+/*************************************************************
+ * Order Summary Page
+ *
+ * Author:		JinJie Xu
+ * Date Created:	2/1/2019
+ **************************************************************/
+
 import React, { Component } from "react";
 import {
   ScrollView,
@@ -63,9 +70,26 @@ export default class OrderScreen extends Component {
           size={30}
           iconStyle={{ marginRight: 20 }}
           onPress={() => {
-            navigation.setParams({
-              editable: true
-            });
+            Alert.alert(
+              "Warning",
+              "Changes will be saved immediately. Continue?",
+              [
+                {
+                  text: "Cancel",
+                  onPress: () => (confirm = false),
+                  style: "cancel"
+                },
+                {
+                  text: "Yes",
+                  onPress: () => {
+                    navigation.setParams({
+                      editable: true
+                    });
+                  }
+                }
+              ],
+              { cancelable: false }
+            );
           }}
         />
       )
@@ -231,26 +255,43 @@ export default class OrderScreen extends Component {
    *    N/A
    *************************************************************/
   _cancelOrderHandler = async () => {
-    let success = false;
-    await cancelOrder(this.state.orderNo)
-      .then(res => {
-        if (res.ok) {
-          success = true;
-        } else {
-          success = false;
-          console.log("Delete order failed.");
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    Alert.alert(
+      "Warning",
+      "The order will be deleted. Continue?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => (confirm = false),
+          style: "cancel"
+        },
+        {
+          text: "Yes",
+          onPress: async () => {
+            let success = false;
+            await cancelOrder(this.state.orderNo)
+              .then(res => {
+                if (res.ok) {
+                  success = true;
+                } else {
+                  success = false;
+                  console.log("Delete order failed.");
+                }
+              })
+              .catch(err => {
+                console.log(err);
+              });
 
-    if (success) {
-      const { navigation } = this.props;
-      navigation.goBack();
-      // 1 means order submitted
-      navigation.state.params.onBack(null, 0, 0, 0, "", 0);
-    }
+            if (success) {
+              const { navigation } = this.props;
+              navigation.goBack();
+              // 1 means order submitted
+              navigation.state.params.onBack(null, 0, 0, 0, "", 0);
+            }
+          }
+        }
+      ],
+      { cancelable: false }
+    );
   };
 
   /************************************************************

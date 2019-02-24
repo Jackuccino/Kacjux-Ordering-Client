@@ -12,7 +12,8 @@ import {
   FlatList,
   Image,
   TextInput,
-  ScrollView
+  ScrollView,
+  Alert
 } from "react-native";
 import { Button, Icon } from "react-native-elements";
 import IconBadge from "react-native-icon-badge";
@@ -70,54 +71,81 @@ export default class CartScreen extends Component {
    *    N/A
    *************************************************************/
   _submitOrdersHandler = async () => {
-    const { navigation } = this.props;
+    let confirm = false;
+    Alert.alert(
+      "Warning",
+      "The order will be submitted. Continue?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => (confirm = false),
+          style: "cancel"
+        },
+        {
+          text: "Yes",
+          onPress: async () => {
+            const { navigation } = this.props;
 
-    // Make a deep copy of the order items before changing quantities to 0
-    const copyOrderItems = JSON.parse(JSON.stringify(this.state.orderItems));
-    let success = false;
+            // Make a deep copy of the order items before changing quantities to 0
+            const copyOrderItems = JSON.parse(
+              JSON.stringify(this.state.orderItems)
+            );
+            let success = false;
 
-    // Note and table number is the same for each item, so define before loop
-    const note = navigation.getParam("note", "");
-    const tableNum = navigation.getParam("tableNum", 1);
-    const orderNo = this.state.orderNo;
+            // Note and table number is the same for each item, so define before loop
+            const note = navigation.getParam("note", "");
+            const tableNum = navigation.getParam("tableNum", 1);
+            const orderNo = this.state.orderNo;
 
-    // Send request
-    for (const item of this.state.orderItems) {
-      // Send each new order to the database
-      const quantity = item.quantity;
-      const totalPrice = item.price * quantity;
-      const orderItem = item.id;
+            // Send request
+            for (const item of this.state.orderItems) {
+              // Send each new order to the database
+              const quantity = item.quantity;
+              const totalPrice = item.price * quantity;
+              const orderItem = item.id;
 
-      // Create an Order object
-      const newOrder = {
-        OrderNo: orderNo,
-        TotalPrice: `$${totalPrice}`,
-        OrderItem: orderItem,
-        Quantity: quantity,
-        Note: note,
-        TableNum: tableNum
-      };
+              // Create an Order object
+              const newOrder = {
+                OrderNo: orderNo,
+                TotalPrice: `$${totalPrice}`,
+                OrderItem: orderItem,
+                Quantity: quantity,
+                Note: note,
+                TableNum: tableNum
+              };
 
-      // Call api and save to database
-      await postNewOrder(newOrder)
-        .then(res => {
-          if (res.ok) {
-            success = true;
-          } else {
-            success = false;
-            console.log("Place order failed.");
+              // Call api and save to database
+              await postNewOrder(newOrder)
+                .then(res => {
+                  if (res.ok) {
+                    success = true;
+                  } else {
+                    success = false;
+                    console.log("Place order failed.");
+                  }
+                })
+                .catch(err => {
+                  console.log(err);
+                });
+            }
+
+            if (success) {
+              navigation.goBack();
+              // 1 means order submitted
+              navigation.state.params.onBack(
+                copyOrderItems,
+                0,
+                0,
+                1,
+                note,
+                orderNo
+              );
+            }
           }
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    }
-
-    if (success) {
-      navigation.goBack();
-      // 1 means order submitted
-      navigation.state.params.onBack(copyOrderItems, 0, 0, 1, note, orderNo);
-    }
+        }
+      ],
+      { cancelable: false }
+    );
   };
 
   /************************************************************
