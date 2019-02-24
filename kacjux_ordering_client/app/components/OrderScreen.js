@@ -123,6 +123,22 @@ export default class OrderScreen extends Component {
       });
       navigation.setParams({ orderItems: this.state.orderItems });
     }
+
+    this._submitOrdersHandler = this._submitOrdersHandler.bind(this);
+    this._modifyOrderHandler = this._modifyOrderHandler.bind(this);
+    this._deleteItemFromOrderHandler = this._deleteItemFromOrderHandler.bind(
+      this
+    );
+    this._cancelOrderHandler = this._cancelOrderHandler.bind(this);
+    this._itemPlusHandler = this._itemPlusHandler.bind(this);
+    this._addTotalPrice = this._addTotalPrice.bind(this);
+    this._minusTotalPrice = this._minusTotalPrice.bind(this);
+    this._addTotalItem = this._addTotalItem.bind(this);
+    this._minusTotalItem = this._minusTotalItem.bind(this);
+    this._itemMinusHandler = this._itemMinusHandler.bind(this);
+    //this._stopTimer = this._stopTimer.bind(this);
+    this._deleteItem = this._deleteItem.bind(this);
+    this._renderItem = this._renderItem.bind(this);
   }
 
   /************************************************************
@@ -384,12 +400,9 @@ export default class OrderScreen extends Component {
     // If the total item is 1, which means this is the last item to be deleted
     // Go back to home screen since the cart will be empty
     const { navigation } = this.props;
-    if (navigation.getParam("totalItem", 0) === 1) {
-      navigation.goBack();
-      navigation.state.params.onBack(0, 0, 0, navigation.getParam("note", ""));
-    }
-
-    if (item.quantity > 0) {
+    if (navigation.getParam("totalItem", 0) <= 1) {
+      this._cancelOrderHandler();
+    } else {
       item.quantity--;
       this._minusTotalItem();
       this._minusTotalPrice(item.price);
@@ -428,31 +441,31 @@ export default class OrderScreen extends Component {
     // Same as _itemMinusHandler
     // If the total item is 1, which means this is the last item to be deleted
     // Go back to home screen since the cart will be empty
-    if (totalItem - item.quantity === 0) {
+    if (totalItem - item.quantity <= 0) {
       this._cancelOrderHandler();
+    } else {
+      const totalPrice = navigation.getParam("totalPrice", 0);
+
+      // Update total number of items
+      if (totalItem > 0) {
+        navigation.setParams({
+          totalItem: totalItem - item.quantity
+        });
+      }
+
+      // Update total price
+      if (totalPrice > 0) {
+        navigation.setParams({
+          totalPrice: totalPrice - (item.quantity * item.price).toFixed(2)
+        });
+      }
+
+      // Quantity of the item is set to 0 because the entire item is deleted
+      item.quantity = 0;
+
+      // delete from database as well
+      this._deleteItemFromOrderHandler(item);
     }
-
-    const totalPrice = navigation.getParam("totalPrice", 0);
-
-    // Update total number of items
-    if (totalItem > 0) {
-      navigation.setParams({
-        totalItem: totalItem - item.quantity
-      });
-    }
-
-    // Update total price
-    if (totalPrice > 0) {
-      navigation.setParams({
-        totalPrice: totalPrice - (item.quantity * item.price).toFixed(2)
-      });
-    }
-
-    // Quantity of the item is set to 0 because the entire item is deleted
-    item.quantity = 0;
-
-    // delete from database as well
-    this._deleteItemFromOrderHandler(item);
   };
 
   /************************************************************

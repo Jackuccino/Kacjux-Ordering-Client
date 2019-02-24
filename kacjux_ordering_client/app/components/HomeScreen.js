@@ -55,6 +55,23 @@ export default class HomeScreen extends Component {
     };
     // For press and hold to add items to order
     // this.timer = null;
+
+    this._getItems = this._getItems.bind(this);
+    this._updateData = this._updateData.bind(this);
+    this._itemPlusHandler = this._itemPlusHandler.bind(this);
+    this._itemMinusHandler = this._itemMinusHandler.bind(this);
+    //this._stopTimer = this._stopTimer.bind(this);
+    this._addTotalPrice = this._addTotalPrice.bind(this);
+    this._minusTotalPrice = this._minusTotalPrice.bind(this);
+    this._addTotalItem = this._addTotalItem.bind(this);
+    this._minusTotalItem = this._minusTotalItem.bind(this);
+    this._renderSectionHeader = this._renderSectionHeader.bind(this);
+    this._renderItem = this._renderItem.bind(this);
+    this._getSelectedItems = this._getSelectedItems.bind(this);
+    this._getDate = this._getDate.bind(this);
+    this._setOrderNo = this._setOrderNo.bind(this);
+    this._orderSummaryPageHandler = this._orderSummaryPageHandler.bind(this);
+    this._cartPageHandler = this._cartPageHandler.bind(this);
   }
 
   componentDidMount() {

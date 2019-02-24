@@ -60,6 +60,17 @@ export default class CartScreen extends Component {
       // Holds the order number and gets from navigation parameter
       orderNo: navigation.getParam("orderNo", null)
     };
+
+    this._submitOrdersHandler = this._submitOrdersHandler.bind(this);
+    this._itemPlusHandler = this._itemPlusHandler.bind(this);
+    this._itemMinusHandler = this._itemMinusHandler.bind(this);
+    //this._stopTimer = this._stopTimer.bind(this);
+    this._addTotalPrice = this._addTotalPrice.bind(this);
+    this._minusTotalPrice = this._minusTotalItem.bind(this);
+    this._addTotalItem = this._addTotalItem.bind(this);
+    this._minusTotalItem = this._minusTotalItem.bind(this);
+    this._deleteItem = this._deleteItem.bind(this);
+    this._renderItem = this._renderItem.bind(this);
   }
 
   /************************************************************

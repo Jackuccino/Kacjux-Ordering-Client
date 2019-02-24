@@ -40,6 +40,15 @@ export class CategoryMenu extends Component {
       // to avoid reseting color on the first item header
       initState: true
     };
+
+    this._getSectionRows = this._getSectionRows.bind(this);
+    this._getSearchableItemList = this._getSearchableItemList.bind(this);
+    this._resetHighlight = this._resetHighlight.bind(this);
+    this._onMenuScroll = this._onMenuScroll.bind(this);
+    this._highlightOnScroll = this._highlightOnScroll.bind(this);
+    this._onEndScroll = this._onEndScroll.bind(this);
+    this._scrollToSection = this._scrollToSection.bind(this);
+    this._renderSideBarMenuItem = this._renderSideBarMenuItem.bind(this);
   }
 
   /************************************************************
