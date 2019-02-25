@@ -375,12 +375,7 @@ export default class HomeScreen extends Component {
                     name: "remove",
                     size: 15
                   }}
-                  containerViewStyle={{ borderRadius: 30 }}
-                  borderRadius={30}
-                  buttonStyle={[
-                    Styles.itemMinusButton,
-                    { backgroundColor: "red" }
-                  ]}
+                  buttonStyle={Styles.itemMinusButton}
                   onPress={this._itemMinusHandler.bind(this, section.data[i])}
                 />
               )}
@@ -394,8 +389,6 @@ export default class HomeScreen extends Component {
                   name: "add",
                   size: 15
                 }}
-                containerViewStyle={{ borderRadius: 30 }}
-                borderRadius={30}
                 buttonStyle={Styles.itemPlusButton}
                 onPress={this._itemPlusHandler.bind(this, section.data[i])}
                 //onPressIn={this._itemPlusHandler.bind(this, section.data[i])}

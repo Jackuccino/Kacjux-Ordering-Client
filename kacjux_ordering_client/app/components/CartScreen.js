@@ -349,8 +349,6 @@ export default class CartScreen extends Component {
         <View style={Styles.itemCounterContainer}>
           <Button
             icon={{ name: "remove" }}
-            containerViewStyle={{ borderRadius: 30 }}
-            borderRadius={30}
             buttonStyle={Styles.itemMinusButton}
             onPress={this._itemMinusHandler.bind(this, item)}
             //onPressIn={this._itemMinusHandler.bind(this, item.id)}
@@ -361,8 +359,6 @@ export default class CartScreen extends Component {
           </View>
           <Button
             icon={{ name: "add" }}
-            containerViewStyle={{ borderRadius: 30 }}
-            borderRadius={30}
             buttonStyle={Styles.itemPlusButton}
             onPress={this._itemPlusHandler.bind(this, item)}
             //onPressIn={this._itemPlusHandler.bind(this, item.id)}

@@ -50,48 +50,137 @@ export default class OrderScreen extends Component {
     ),
     headerRight:
       navigation.getParam("editable", null) === true ? (
-        <Icon
-          name="done"
-          color="green"
-          type="material-icons"
-          size={30}
-          iconStyle={{ marginRight: 20 }}
-          onPress={() => {
-            navigation.setParams({
-              editable: false
-            });
-          }}
-        />
-      ) : (
-        <Icon
-          name="circle-edit-outline"
-          color="red"
-          type="material-community"
-          size={30}
-          iconStyle={{ marginRight: 20 }}
-          onPress={() => {
-            Alert.alert(
-              "Warning",
-              "Changes will be saved immediately. Continue?",
-              [
-                {
-                  text: "Cancel",
-                  onPress: () => (confirm = false),
-                  style: "cancel"
-                },
-                {
-                  text: "Yes",
-                  onPress: () => {
-                    navigation.setParams({
-                      editable: true
-                    });
+        <View style={Styles.horizontalView}>
+          <Icon
+            name="done"
+            color="green"
+            type="material-icons"
+            size={30}
+            iconStyle={{ marginRight: 20 }}
+            onPress={() => {
+              navigation.setParams({
+                editable: false
+              });
+            }}
+          />
+          <Icon
+            name="cancel"
+            color="red"
+            type="material-icons"
+            size={30}
+            iconStyle={{ marginRight: 20 }}
+            onPress={() => {
+              Alert.alert(
+                "Warning",
+                "The order will be deleted. Continue?",
+                [
+                  {
+                    text: "Cancel",
+                    style: "cancel"
+                  },
+                  {
+                    text: "Yes",
+                    onPress: async () => {
+                      let success = false;
+                      await cancelOrder(navigation.getParam("orderNo", null))
+                        .then(res => {
+                          if (res.ok) {
+                            success = true;
+                          } else {
+                            success = false;
+                            console.log("Delete order failed.");
+                          }
+                        })
+                        .catch(err => {
+                          console.log(err);
+                        });
+
+                      if (success) {
+                        navigation.goBack();
+                        navigation.state.params.onBack(null, 0, 0, 0, "", 0);
+                      }
+                    }
                   }
-                }
-              ],
-              { cancelable: false }
-            );
-          }}
-        />
+                ],
+                { cancelable: false }
+              );
+            }}
+          />
+        </View>
+      ) : (
+        <View style={Styles.horizontalView}>
+          <Icon
+            name="circle-edit-outline"
+            color="red"
+            type="material-community"
+            size={30}
+            iconStyle={{ marginRight: 20 }}
+            onPress={() => {
+              Alert.alert(
+                "Warning",
+                "Changes will be saved immediately. Continue?",
+                [
+                  {
+                    text: "Cancel",
+                    style: "cancel"
+                  },
+                  {
+                    text: "Yes",
+                    onPress: () => {
+                      navigation.setParams({
+                        editable: true
+                      });
+                    }
+                  }
+                ],
+                { cancelable: false }
+              );
+            }}
+          />
+          <Icon
+            name="cancel"
+            color="red"
+            type="material-icons"
+            size={30}
+            iconStyle={{ marginRight: 20 }}
+            onPress={() => {
+              Alert.alert(
+                "Warning",
+                "The order will be deleted. Continue?",
+                [
+                  {
+                    text: "Cancel",
+                    style: "cancel"
+                  },
+                  {
+                    text: "Yes",
+                    onPress: async () => {
+                      let success = false;
+                      await cancelOrder(navigation.getParam("orderNo", null))
+                        .then(res => {
+                          if (res.ok) {
+                            success = true;
+                          } else {
+                            success = false;
+                            console.log("Delete order failed.");
+                          }
+                        })
+                        .catch(err => {
+                          console.log(err);
+                        });
+
+                      if (success) {
+                        navigation.goBack();
+                        navigation.state.params.onBack(null, 0, 0, 0, "", 0);
+                      }
+                    }
+                  }
+                ],
+                { cancelable: false }
+              );
+            }}
+          />
+        </View>
       )
   });
 
@@ -124,6 +213,7 @@ export default class OrderScreen extends Component {
       navigation.setParams({ orderItems: this.state.orderItems });
     }
 
+    this._goBackAndReset = this._goBackAndReset.bind(this);
     this._submitOrdersHandler = this._submitOrdersHandler.bind(this);
     this._modifyOrderHandler = this._modifyOrderHandler.bind(this);
     this._deleteItemFromOrderHandler = this._deleteItemFromOrderHandler.bind(
@@ -140,6 +230,31 @@ export default class OrderScreen extends Component {
     this._deleteItem = this._deleteItem.bind(this);
     this._renderItem = this._renderItem.bind(this);
   }
+
+  /************************************************************
+   * Purpose:
+   *    Go back to home screen with default reset values
+   * Params:
+   *    N/A
+   * Returns:
+   *    N/A
+   *************************************************************/
+  _goBackAndReset = () => {
+    Alert.alert("Warning", "The order will be closed. Continue?", [
+      {
+        text: "Cancel",
+        style: "cancel"
+      },
+      {
+        text: "Yes",
+        onPress: async () => {
+          const { navigation } = this.props;
+          navigation.goBack();
+          navigation.state.params.onBack(null, 0, 0, 0, "", 0);
+        }
+      }
+    ]);
+  };
 
   /************************************************************
    * Purpose:
@@ -277,7 +392,6 @@ export default class OrderScreen extends Component {
       [
         {
           text: "Cancel",
-          onPress: () => (confirm = false),
           style: "cancel"
         },
         {
@@ -300,7 +414,6 @@ export default class OrderScreen extends Component {
             if (success) {
               const { navigation } = this.props;
               navigation.goBack();
-              // 1 means order submitted
               navigation.state.params.onBack(null, 0, 0, 0, "", 0);
             }
           }
@@ -499,8 +612,6 @@ export default class OrderScreen extends Component {
         <View style={Styles.itemCounterContainer}>
           <Button
             icon={{ name: "remove" }}
-            containerViewStyle={{ borderRadius: 30 }}
-            borderRadius={30}
             buttonStyle={Styles.itemMinusButton}
             onPress={this._itemMinusHandler.bind(this, item)}
             //onPressIn={this._itemMinusHandler.bind(this, item.id)}
@@ -511,8 +622,6 @@ export default class OrderScreen extends Component {
           </View>
           <Button
             icon={{ name: "add" }}
-            containerViewStyle={{ borderRadius: 30 }}
-            borderRadius={30}
             buttonStyle={Styles.itemPlusButton}
             onPress={this._itemPlusHandler.bind(this, item)}
             //onPressIn={this._itemPlusHandler.bind(this, item.id)}
@@ -576,18 +685,18 @@ export default class OrderScreen extends Component {
             scrollEnabled={true}
           />
         </View>
-        {/* cancel button bar */}
+        {/* Close button bar */}
         <View style={Styles.bottom}>
           <Text style={[Styles.totalPrice, { marginLeft: 45 }]}>Total: </Text>
           <Text style={Styles.totalPrice}>
             ${navigation.getParam("totalPrice", 0).toFixed(2)}
           </Text>
           <Button
-            title="Cancel"
+            title="Close"
             buttonStyle={Styles.cartButton}
             textStyle={Styles.cartText}
             containerViewStyle={Styles.cartContainerView}
-            onPress={this._cancelOrderHandler}
+            onPress={this._goBackAndReset}
           />
         </View>
       </ScrollView>
