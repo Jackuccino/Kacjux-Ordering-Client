@@ -1,9 +1,9 @@
-const apiPostNewOrder = "http://96.41.173.63:8080/api/orders/";
-const apiGetAllItems = "http://96.41.173.63:8080/api/items/";
-const apiCancelOrder = "http://96.41.173.63:8080/api/orders/delete-order/";
-const apiModifyOrder = "http://96.41.173.63:8080/api/orders/change-quantity/";
+const apiPostNewOrder = "http://75.142.137.172:8080/api/orders/";
+const apiGetAllItems = "http://75.142.137.172:8080/api/items/";
+const apiCancelOrder = "http://75.142.137.172:8080/api/orders/delete-order/";
+const apiModifyOrder = "http://75.142.137.172:8080/api/orders/change-quantity/";
 const apiDeleteItemFromOrder =
-  "http://96.41.173.63:8080/api/orders/remove-item/";
+  "http://75.142.137.172:8080/api/orders/remove-item/";
 
 exports.postNewOrder = params => {
   return fetch(apiPostNewOrder, {
