@@ -431,15 +431,38 @@ export default class HomeScreen extends Component {
    *    return a string of current date time
    *************************************************************/
   _getDate = () => {
+    // The 0 string
+    const zero = "0";
     // Get the current date
     const date = new Date();
     // The unique format is month + day + hour + minute
-    return (
-      (date.getMonth() + 1).toLocaleString("en-us", { month: "long" }) +
-      date.getDate().toString() +
-      date.getHours().toString() +
-      date.getMinutes().toString()
-    );
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const hour = date.getHours();
+    const minute = date.getMinutes();
+    // The month day hour, and minute string var
+    var month_string = month.toLocaleString("en-us", { month: "long" });
+    var day_string = day.toString();
+    var hour_string = hour.toString();
+    var minute_string = minute.toString();
+
+    if (month < 10) {
+      month_string = zero + month_string;
+    }
+
+    if (day < 10) {
+      day_string = zero + day_string;
+    }
+
+    if (hour < 10) {
+      hour_string = zero + hour_string;
+    }
+
+    if (minute < 10) {
+      minute_string = zero + minute_string;
+    }
+
+    return month_string + day_string + hour_string + minute_string;
   };
 
   /************************************************************
