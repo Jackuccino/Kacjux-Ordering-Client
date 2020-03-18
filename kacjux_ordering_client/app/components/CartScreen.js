@@ -66,7 +66,7 @@ export default class CartScreen extends Component {
     this._itemMinusHandler = this._itemMinusHandler.bind(this);
     //this._stopTimer = this._stopTimer.bind(this);
     this._addTotalPrice = this._addTotalPrice.bind(this);
-    this._minusTotalPrice = this._minusTotalItem.bind(this);
+    this._minusTotalPrice = this._minusTotalPrice.bind(this);
     this._addTotalItem = this._addTotalItem.bind(this);
     this._minusTotalItem = this._minusTotalItem.bind(this);
     this._deleteItem = this._deleteItem.bind(this);
